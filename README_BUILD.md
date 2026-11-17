@@ -4,11 +4,11 @@ Esta edição aplica a identidade visual da Apollo11 ao RustDesk **1.5.3**. A pa
 
 O nome mostrado na interface, a logo, os ícones e as cores podem mudar. Os nomes internos `RustDesk`, `rustdesk.exe`, `librustdesk.dll`, o serviço e o identificador do aplicativo Mac são preservados. Isso mantém os caminhos de configuração e a identidade da instalação existente. Esta edição não deve ser tratada como um segundo serviço para instalar ao lado do RustDesk oficial.
 
-O procedimento de geração está preparado, mas os executáveis Windows e Mac **só existem depois que a compilação terminar com sucesso**. Preparar os fontes ou validar o YAML não gera esses executáveis.
+A [execução de compilação nativa](https://github.com/filipecaires1988/apollo11-remoto/actions/runs/44009980042) produziu o EXE Windows x64 e os DMGs Mac Intel e Mac Apple Silicon. Os três trabalhos nativos e a execução completa concluíram com sucesso. Os três arquivos nativos foram baixados e conferidos; os testes de interface, instalação e conexão real continuam pendentes.
 
 ## Arquivos de compilação
 
-A pasta `overlay/.github/workflows/` contém:
+A pasta `.github/workflows/`, na raiz deste repositório, contém:
 
 | Arquivo | Função |
 |---|---|
@@ -16,16 +16,16 @@ A pasta `overlay/.github/workflows/` contém:
 | `bridge.yml` | Gera a ligação entre Rust e Flutter usada pelo aplicativo. |
 | `third-party-RustDeskTempTopMostWindow.yml` | Compila o auxiliar Windows oficial, no commit fixado pelo projeto. |
 
-Os três arquivos precisam ficar em `.github/workflows/` **na raiz dos fontes completos preparados**, junto de `Cargo.toml`, `build.py`, `flutter/`, `libs/` e os demais arquivos do RustDesk. O diretório `overlay/` sozinho não é um projeto compilável.
+Os três arquivos já estão em `.github/workflows/` **na raiz dos fontes completos preparados**, junto de `Cargo.toml`, `build.py`, `flutter/`, `libs/` e os demais arquivos do RustDesk. Use essa árvore completa para compilar.
 
 O workflow foi reduzido a partir do arquivo oficial do tag `1.5.3`. Ele conserva os passos de compilação necessários e remove a publicação de releases, a criação de modelos Pro, a assinatura digital, a notarização e as outras plataformas. As Actions usadas nesses três arquivos estão fixadas por commit.
 
 ## Gerar usando GitHub Actions
 
-1. Use a pasta `source` desta entrega, que já contém os fontes completos do tag `1.5.3`, a personalização e a biblioteca `hbb_common` no commit registrado.
-2. Coloque o conteúdo dessa pasta em um repositório da sua conta GitHub, com `Cargo.toml` na raiz. Nesta cópia, `libs/hbb_common` é uma pasta normal, incluída integralmente. Não recrie `.gitmodules` nem a transforme em um gitlink vazio.
-3. Abra **Actions** e escolha **Apollo11 Remoto | Windows e Mac**.
-4. Antes da compilação, hospede por HTTPS o ZIP completo dos fontes correspondentes desta edição. O endereço precisa abrir o arquivo diretamente, sem login.
+1. Use a raiz do [repositório público Apollo11 Remoto](https://github.com/filipecaires1988/apollo11-remoto), que já contém os fontes completos do tag `1.5.3`, a personalização e a biblioteca `hbb_common` no commit registrado.
+2. Mantenha `Cargo.toml` na raiz. Nesta cópia, `libs/hbb_common` é uma pasta normal, incluída integralmente. Não recrie `.gitmodules` nem a transforme em um gitlink vazio.
+3. Para uma nova compilação, abra **Actions** e escolha **Apollo11 Remoto | Windows e Mac**.
+4. Use uma URL HTTPS pública do ZIP completo dos fontes do commit que será compilado. O endereço precisa abrir o arquivo diretamente, sem login. O `README.md` indica o ZIP com commit fixado da compilação entregue.
 5. Clique em **Run workflow** e preencha `source_url` com esse endereço real. A opção de executar os testes oficiais vem ligada por padrão.
 6. Aguarde os trabalhos Windows e Mac terminarem. Eles precisam baixar e compilar várias dependências. O limite configurado para cada trabalho nativo é de três horas.
 7. Ao terminar, abra a execução e baixe os arquivos em **Artifacts**.
@@ -34,7 +34,7 @@ O início da execução verifica que `source_url` usa HTTPS e responde com um ar
 
 A rotina exporta `APOLLO11_SOURCE_URL` para `build.py`. A edição preparada encaminha esse valor ao Flutter por um arquivo JSON de definições de compilação, sem inserir a URL em um comando de shell. O endereço fica disponível na tela Sobre do aplicativo. Não há um endereço de demonstração configurado.
 
-O workflow é exclusivamente manual. Não publica site, não cria release, não envia mensagens e não usa certificado ou segredo de assinatura. A execução pode consumir minutos e armazenamento da sua conta GitHub. Nenhuma execução foi iniciada pela simples criação desses arquivos.
+O workflow é exclusivamente manual. Não publica site, não cria release, não envia mensagens e não usa certificado ou segredo de assinatura. A execução atual foi iniciada manualmente, depois da publicação dos fontes. A execução pode consumir minutos e armazenamento da sua conta GitHub.
 
 Se estiver usando uma cópia completa do repositório oficial, desative ou remova os outros workflows automáticos que não fazem parte desta edição antes de enviar o projeto. Isso evita disparar as rotinas de outras plataformas por push ou tag.
 
@@ -49,6 +49,8 @@ Se estiver usando uma cópia completa do repositório oficial, desative ou remov
 | `Apollo11-fontes-1.5.3` | ZIP dos fontes completos com os submódulos, manifesto de commits e SHA-256. |
 
 O aplicativo dentro dos DMGs continua se chamando `RustDesk.app`. Os arquivos externos e a interface identificam a edição Apollo11. Não há MSI nesta primeira rotina reduzida.
+
+Os ZIPs preparados para entrega incluem o EXE ou DMG, sua soma SHA-256, a licença integral `LICENCE` e `LEIA_PRIMEIRO.txt`. Eles preservam o arquivo nativo gerado pela compilação.
 
 O ZIP dos fontes indicado em `source_url` precisa estar realmente hospedado antes de compilar e deve permanecer acessível a quem receber o programa. O artefato de fontes criado pela rotina é uma cópia adicional da árvore usada na execução; ele não publica o arquivo no seu site nem preenche a URL automaticamente.
 
@@ -75,9 +77,18 @@ O projeto de origem usa versões diferentes do Flutter para manter a compatibili
 
 ## Testes da execução
 
-Com `run-tests` ligado, a rotina executa os testes Rust no Windows, os testes Flutter nos dois Macs e os testes Rust específicos no Mac Apple Silicon. Antes de empacotar, confirma também que o executável nativo informa a versão `1.5.3`.
+Na [execução registrada](https://github.com/filipecaires1988/apollo11-remoto/actions/runs/44009980042), foram conferidos os seguintes resultados:
 
-O pacote de fontes e os arquivos finais recebem somas SHA-256. Esses testes verificam a geração, mas não substituem uma conexão real entre os computadores de destino. Esta rotina não promete que o visual modificado já foi validado em Windows ou Mac antes da primeira compilação.
+| Plataforma | Resultado |
+|---|---|
+| Windows x64 | Build concluído com sucesso; 253 testes da biblioteca Rust e 2 testes de clipboard aprovados, sem falhas nem ignorados. Os testes de documentação tiveram 0 casos executados. |
+| Mac Intel | Build concluído com sucesso; 173 testes Dart aprovados e 1 ignorado. |
+| Mac Apple Silicon | Build concluído com sucesso; 173 testes Dart aprovados e 1 ignorado; 255 testes da biblioteca Rust aprovados, sem falhas nem ignorados; 22 testes de clipboard aprovados, sem falhas. Os testes de documentação não continham casos, com 0 executados. |
+| As três plataformas | Executável nativo informou a versão `1.5.3` pela linha de comando. |
+
+Após o download dos três artefatos, foram validados o digest do ZIP informado pelo GitHub, o CRC de suas entradas, o SHA-256 dos arquivos nativos e os formatos PE64 no Windows e DMG nos Macs. O pacote de fontes e os arquivos finais também recebem somas SHA-256.
+
+Essas verificações comprovam a geração e a integridade dos arquivos. A interface gráfica, a instalação sobre RustDesk existente, a preservação efetiva de configurações, as permissões e uma conexão real entre os computadores de destino ainda precisam ser testadas.
 
 ## Uso com os clientes que já têm RustDesk
 
@@ -87,7 +98,7 @@ Como a identidade interna continua RustDesk, IDs, senhas e endereços de servido
 
 ## Assinatura e permissões
 
-Os binários desta rotina não recebem assinatura de editor Windows nem certificado Developer ID/notarização Apple. O sistema pode identificar que o editor não foi verificado. Para uma distribuição assinada, é preciso configurar certificados próprios em uma etapa separada.
+Os binários desta rotina não recebem assinatura de editor Windows nem certificado Developer ID ou notarização Apple. O sistema pode identificar que o editor não foi verificado. Para uma distribuição assinada, é preciso configurar certificados próprios em uma etapa separada.
 
 No Mac, a pessoa continua autorizando a Gravação de Tela e a Acessibilidade nos ajustes do sistema. A rotina não altera essas permissões. O build mantém os arquivos de permissões do RustDesk original.
 

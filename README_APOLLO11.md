@@ -4,7 +4,9 @@ Esta preparação atende ao uso da Apollo11 no suporte aos seus próprios client
 
 ## Estado desta entrega
 
-O código personalizado e os arquivos de compilação estão preparados. **Não há um `.exe` ou `.dmg` personalizado já compilado neste pacote.** A compilação e o teste nativo de Windows/Mac ainda precisam ser realizados.
+O código personalizado está no [repositório público da Apollo11](https://github.com/filipecaires1988/apollo11-remoto). A [execução de compilação nativa de Windows e Mac](https://github.com/filipecaires1988/apollo11-remoto/actions/runs/44009980042) produziu um EXE para Windows x64 e DMGs para Mac Intel e Mac Apple Silicon. Os três artefatos foram baixados e conferidos por digest do ZIP informado pelo GitHub, CRC, SHA-256 dos arquivos nativos e estrutura PE64/DMG. A versão `1.5.3` foi confirmada pela linha de comando nos ambientes nativos de compilação.
+
+Os ZIPs de entrega incluem o arquivo nativo, sua soma SHA-256, a licença integral `LICENCE` e `LEIA_PRIMEIRO.txt`. A interface gráfica, a instalação sobre RustDesk existente, as permissões e uma conexão real entre Windows e Mac ainda precisam ser testadas.
 
 O pacote não contrata serviços, não publica servidores e não altera computadores dos seus clientes.
 
@@ -29,21 +31,21 @@ Para independência da infraestrutura pública, há o servidor OSS gratuito, com
 
 ## Gerar Windows e Mac
 
-Na pasta `source` está a raiz completa do projeto personalizado, incluindo o código da biblioteca `hbb_common` no commit correspondente. A preparação usa uma cópia completa dos fontes, sem exigir um submódulo Git separado.
+Na raiz deste repositório está o projeto personalizado completo, incluindo o código da biblioteca `libs/hbb_common` no commit correspondente. A preparação usa uma cópia completa dos fontes, sem exigir um submódulo Git separado.
 
-O workflow manual `source/.github/workflows/apollo11-build.yml` prepara as versões Windows x64, Mac Intel e Mac Apple Silicon nos ambientes correspondentes. Veja `README_BUILD.md`.
+O workflow manual `.github/workflows/apollo11-build.yml` prepara as versões Windows x64, Mac Intel e Mac Apple Silicon nos ambientes correspondentes. Veja `README_BUILD.md`.
 
-Antes de distribuir uma compilação, publique o pacote de fontes correspondente em um endereço HTTPS acessível aos usuários. Informe esse endereço no parâmetro `source_url` do workflow. Ele será incluído no botão **Código-fonte desta edição** na tela Sobre.
+O ZIP público dos fontes desta compilação está indicado em `README.md`, com o commit fixado. O endereço informado em `source_url` é incluído no botão **Código-fonte desta edição** na tela Sobre. Em uma nova compilação, use os fontes do commit realmente compilado e mantenha esse endereço acessível aos usuários.
 
-O GitHub precisa estar conectado e o projeto precisa ser colocado em um repositório para executar esse fluxo. Nenhum repositório foi criado, nenhuma compilação remota foi executada e nenhum código foi publicado por esta entrega. Confira as condições e os limites da sua conta antes de executar ambientes de compilação.
+O repositório foi publicado e os três builds concluíram com sucesso. Os resultados dos testes e das verificações estão em `README_BUILD.md`. Novas execuções podem consumir minutos e armazenamento da conta GitHub.
 
-Os binários gerados por esse fluxo não têm assinatura digital da Apollo11 nem notarização Apple. Sua distribuição final exige conferir a execução e as permissões em Windows e Mac reais.
+Os binários gerados por esse fluxo não recebem assinatura de editor Windows nem Developer ID ou notarização Apple. Sua distribuição final exige conferir a execução e as permissões em Windows e Mac reais.
 
 ## Código aberto, uso próprio e atendimento a clientes
 
 Atender os próprios clientes é compatível com a finalidade desta edição. Entregar uma versão modificada aos clientes continua sendo distribuição, mesmo sem vender o software.
 
-O arquivo `source/LICENCE` contém a licença AGPL-3.0. Os créditos originais foram preservados. Entregue o código completo correspondente e as instruções de compilação junto da edição; o acesso remoto aos fontes também precisa ficar disponível pelo endereço informado na compilação. O arquivo `MODIFICACOES_APOLLO11.md` registra os arquivos e caminhos alterados.
+O arquivo `LICENCE`, na raiz deste repositório, contém a licença AGPL-3.0. Os créditos originais foram preservados. Entregue o código completo correspondente e as instruções de compilação junto da edição; o acesso remoto aos fontes também precisa ficar disponível pelo endereço informado na compilação. O arquivo `MODIFICACOES_APOLLO11.md` registra os arquivos e caminhos alterados.
 
 ## Atualizações
 

@@ -4,7 +4,7 @@ Edição `1.5.3-apollo11.1`, preparada em 16/11/2026, com base em RustDesk 1.5.3
 
 ## Arquivos existentes com comportamento alterado
 
-| Arquivo em `source` | Caminho alterado | Motivo |
+| Arquivo na raiz deste repositório | Caminho alterado | Motivo |
 | --- | --- | --- |
 | `flutter/lib/common.dart` | Paleta, constantes de marca e URL de fontes | Aplicar azul escuro e amarelo, preservar leitura no tema claro e fornecer identidade visual compartilhada. |
 | `flutter/lib/desktop/pages/desktop_home_page.dart` | Cabeçalho do painel lateral | Mostrar a logo original e Apollo11 Remoto. |
@@ -33,9 +33,15 @@ Os ícones em `res`, `flutter/windows/runner/resources` e `flutter/macos/Runner`
 - Inclusão da URL por JSON exercitada com endereço contendo parâmetros; HTTP, credenciais, fragmentos e espaços foram rejeitados.
 - YAML, dependências de jobs, referências de Actions e trechos Bash dos workflows verificados localmente.
 - Comparação de bytes confirmou a preservação de `src/lib.rs`, `src/server/connection.rs`, `src/rendezvous_mediator.rs`, `src/platform/windows.rs`, `src/platform/macos.rs`, `libs/hbb_common/src/config.rs`, `Cargo.toml` e `Cargo.lock`.
+- O [repositório público](https://github.com/filipecaires1988/apollo11-remoto) foi publicado. A [execução de compilação nativa](https://github.com/filipecaires1988/apollo11-remoto/actions/runs/44009980042) gerou os três arquivos nativos. Os três trabalhos nativos e a execução completa concluíram com sucesso.
+- No Windows, 253 testes da biblioteca Rust e 2 testes de clipboard foram aprovados, sem falhas nem ignorados; os testes de documentação tiveram 0 casos executados.
+- Em cada Mac, 173 testes Dart foram aprovados e 1 foi ignorado. No Mac Apple Silicon, 255 testes da biblioteca Rust foram aprovados, sem falhas nem ignorados, e 22 testes de clipboard passaram sem falhas; os testes de documentação tiveram 0 casos executados.
+- Nos três ambientes nativos, a versão informada pela linha de comando foi `1.5.3`.
+- Os três artefatos foram baixados e validados por digest do ZIP informado pelo GitHub, CRC, SHA-256 dos arquivos nativos e estrutura dos formatos PE64/DMG.
+- Os ZIPs de entrega incluem o EXE ou DMG, sua soma SHA-256, a licença integral `LICENCE` e `LEIA_PRIMEIRO.txt`.
 
 ## O que ainda falta validar
 
-Não foi feita compilação Rust/Flutter nativa. Não há executáveis personalizados prontos nesta entrega. A aparência real, a instalação sobre RustDesk existente, a preservação de configurações e as sessões entre Windows e Mac precisam ser testadas após a compilação.
+A compilação e a integridade dos três arquivos nativos foram verificadas. A aparência real da interface, a instalação sobre RustDesk existente, a preservação efetiva de configurações, as permissões e as sessões entre Windows e Mac ainda precisam ser testadas em computadores de destino.
 
-O pacote de fontes precisa ser hospedado em endereço HTTPS disponível aos usuários antes de distribuir uma compilação com o link desta edição. Os binários gerados pelo workflow serão sem assinatura digital da Apollo11 e sem notarização Apple.
+O ZIP público dos fontes do commit usado nesta compilação está indicado em `README.md`. Esse endereço precisa continuar disponível aos usuários. Os binários gerados pelo workflow não recebem assinatura de editor Windows nem Developer ID ou notarização Apple.

@@ -6,13 +6,15 @@ Inclui logo original, cores azul escuro e amarelo, nome visual Apollo11 Remoto e
 
 ## Instaladores
 
-As compilações personalizadas ficam nas execuções da aba [Actions](https://github.com/filipecaires1988/apollo11-remoto/actions). Os arquivos são disponibilizados após uma execução concluir com sucesso. Não confunda o pacote de fontes com um instalador.
+O [repositório público](https://github.com/filipecaires1988/apollo11-remoto) já está disponível. A [execução de compilação Windows e Mac](https://github.com/filipecaires1988/apollo11-remoto/actions/runs/44009980042) produziu os arquivos nativos para Windows x64, Mac Intel e Mac Apple Silicon. Os três artefatos foram baixados e conferidos por integridade do ZIP, SHA-256 dos arquivos e estrutura dos formatos PE64/DMG. A versão `1.5.3` foi confirmada nos ambientes nativos de compilação.
 
-O fluxo manual produz Windows x64, Mac Intel e Mac Apple Silicon. Os arquivos são inicialmente sem assinatura digital da Apollo11 e sem notarização Apple; precisam ser testados nos computadores de destino antes da distribuição.
+Os ZIPs de entrega incluem o EXE ou DMG, sua soma SHA-256, a licença integral `LICENCE` e `LEIA_PRIMEIRO.txt`. Não confunda o pacote de fontes com um instalador.
+
+Os arquivos não recebem assinatura de editor Windows nem Developer ID ou notarização Apple. A interface gráfica, a instalação sobre RustDesk existente e uma conexão real entre os computadores de destino ainda precisam ser testadas.
 
 ## Código-fonte e licença
 
-Este repositório inclui o código completo correspondente, inclusive a biblioteca hbb_common no commit registrado em BUILD_BASE.txt. [Baixar fontes](https://github.com/filipecaires1988/apollo11-remoto/archive/refs/heads/main.zip).
+Este repositório inclui o código completo correspondente, inclusive a biblioteca hbb_common no commit registrado em BUILD_BASE.txt. [Baixar fontes do commit usado nesta compilação](https://github.com/filipecaires1988/apollo11-remoto/archive/1c94292fd6a3ad2b7ec2cc0a9ecbb6c47053ee7a.zip).
 
 O código continua sob [AGPL-3.0](LICENCE). A edição identifica as alterações e mantém os créditos do projeto RustDesk. Apollo11 não é afiliada ao projeto original.
 
