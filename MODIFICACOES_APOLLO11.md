@@ -1,6 +1,8 @@
 # Modificações desta edição
 
-Edição `1.5.3-apollo11.2`, preparada em 17/11/2026, com base em RustDesk 1.5.3. A identidade visual pertence à Apollo11. O código RustDesk e seus avisos originais continuam sob AGPL-3.0.
+Edição `1.5.3-apollo11.3-central`, preparada em 17/11/2026, com base em RustDesk 1.5.3. A identidade visual pertence à Apollo11. O código RustDesk e seus avisos originais continuam sob AGPL-3.0.
+
+A edição atual acrescenta a [Central Apollo11](CENTRAL_APOLLO11.md), com módulos próprios de interface, armazenamento, API e contato periódico do serviço. O guia registra a superfície de alteração e os limites. As verificações das seções `.1` e `.2` abaixo permanecem históricas.
 
 ## Arquivos existentes com comportamento alterado
 

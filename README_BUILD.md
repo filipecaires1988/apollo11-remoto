@@ -4,7 +4,7 @@ Esta edição aplica a identidade visual da Apollo11 ao RustDesk **1.5.3**. A pa
 
 O nome mostrado na interface, a logo, os ícones e as cores podem mudar. Os nomes internos `RustDesk`, `rustdesk.exe`, `librustdesk.dll`, o serviço e o identificador do aplicativo Mac são preservados. Isso mantém os caminhos de configuração e a identidade da instalação existente. Esta edição não deve ser tratada como um segundo serviço para instalar ao lado do RustDesk oficial.
 
-A edição `1.5.3-apollo11.2` acrescenta os nomes Suporte Apollo11 nos atalhos Windows e Apollo11 no aviso da bandeja. O EXE externo do pacote de entrega se chama `Suporte Apollo11.exe`. O núcleo continua na versão `1.5.3`.
+A edição `1.5.3-apollo11.3-central` acrescenta a [Central Apollo11](CENTRAL_APOLLO11.md). O núcleo continua na versão `1.5.3`. Os resultados da edição `.2` registrados abaixo são históricos e não validam as novas funcionalidades.
 
 A [execução da edição .2 foi concluída](https://github.com/filipecaires1988/apollo11-remoto/actions/runs/44021193167), com sucesso nos três trabalhos nativos e na execução completa. Os arquivos nativos das três plataformas foram baixados e conferidos. Os resultados atuais e os da execução anterior estão separados abaixo. Os testes de interface gráfica, instalação, migração e conexão real continuam pendentes.
 

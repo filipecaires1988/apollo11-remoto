@@ -317,6 +317,8 @@ impl RendezvousMediator {
             }
         }
         crate::hbbs_http::sync::start();
+        #[cfg(any(target_os = "windows", target_os = "macos"))]
+        crate::apollo11_central::start();
         #[cfg(target_os = "windows")]
         if crate::platform::is_installed() && crate::is_server() {
             crate::updater::start_auto_update();

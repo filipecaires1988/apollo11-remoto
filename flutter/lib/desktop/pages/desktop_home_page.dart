@@ -24,6 +24,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:window_size/window_size.dart' as window_size;
 import '../widgets/button.dart';
+import '../../apollo11/central_native.dart';
 
 class DesktopHomePage extends StatefulWidget {
   const DesktopHomePage({Key? key}) : super(key: key);
@@ -104,6 +105,15 @@ class _DesktopHomePageState extends State<DesktopHomePage>
           ),
         ),
       ),
+      if (isWindows || isMacOS)
+        Padding(
+          padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+          child: FilledButton.icon(
+            onPressed: () => openApollo11Central(context),
+            icon: const Icon(Icons.devices, size: 18),
+            label: const Text('Meus clientes'),
+          ),
+        ),
       buildTip(context),
       if (!isOutgoingOnly) buildIDBoard(context),
       if (!isOutgoingOnly) buildPasswordBoard(context),

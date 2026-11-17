@@ -4,7 +4,13 @@ Edição visual da Apollo11 para atendimento aos seus próprios clientes, basead
 
 Inclui logo original, cores azul escuro e amarelo, nome visual Apollo11 Remoto e ícones para Windows e Mac. A identidade interna do aplicativo, a configuração de rede e o protocolo do RustDesk foram preservados.
 
-## Atualização apollo11.2
+## Central Apollo11: edição apollo11.3-central
+
+A nova edição acrescenta **Meus clientes**: grupos por cliente, cadastro de computadores por ID, busca, favoritos, exportação/importação e conexão pela autenticação normal do acesso remoto. O modo local funciona sem servidor. O modo online usa o catálogo PHP incluído neste repositório e permite vincular cada computador por um convite de uso único.
+
+O serviço instalado pode atualizar o cadastro mesmo com a janela fechada, após vínculo explícito. O catálogo precisa ser implantado em uma hospedagem HTTPS compatível; nenhum servidor de administração vem pré-configurado. Consulte o [guia da Central Apollo11](CENTRAL_APOLLO11.md) e as [instruções da API](central-server/README.md). Os resultados abaixo pertencem à edição anterior, `.2`.
+
+## Histórico: atualização apollo11.2
 
 Na edição `1.5.3-apollo11.2`, o atalho Windows passa a se chamar **Suporte Apollo11** e o aviso da bandeja usa **Apollo11**. O EXE externo do pacote de entrega se chama **Suporte Apollo11.exe**. O núcleo RustDesk continua na versão `1.5.3`.
 

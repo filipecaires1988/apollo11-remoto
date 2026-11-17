@@ -1,0 +1,48 @@
+name: Central Apollo11 | Cadastro e API
+'on':
+  push:
+    branches: [apollo11-central]
+    paths:
+      - 'central-server/**'
+      - 'flutter/lib/apollo11/**'
+      - 'flutter/test/apollo11_*_test.dart'
+      - '.github/workflows/apollo11-central-checks.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  api:
+    name: Cadastro, autenticação e vínculo
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          persist-credentials: false
+      - name: Instalar PHP e SQLite
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y php-cli php-sqlite3
+      - name: Conferir a sintaxe PHP
+        run: find central-server -name '*.php' -print0 | xargs -0 -n 1 php -l
+      - name: Testar a API com banco temporário
+        run: python3 central-server/tests/integration.py
+  catalog:
+    name: Cadastro local e cliente da API
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          persist-credentials: false
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2
+        with:
+          channel: stable
+          flutter-version: '3.24.5'
+          cache: true
+      - name: Instalar as dependências existentes
+        working-directory: flutter
+        run: flutter pub get
+      - name: Testar a Central Apollo11
+        working-directory: flutter
+        run: flutter test --timeout 60s test/apollo11_*_test.dart

@@ -2,7 +2,11 @@
 
 Esta preparação atende ao uso da Apollo11 no suporte aos seus próprios clientes. A base é o cliente aberto RustDesk 1.5.3, com identidade visual Apollo11. O cliente Server Pro e seu gerador pago não fazem parte desta preparação.
 
-## Atualização apollo11.2
+## Central Apollo11: edição apollo11.3-central
+
+Esta edição acrescenta o cadastro de clientes e computadores à janela principal, com armazenamento local e catálogo online opcional. Veja o [guia de uso, instalação e limites](CENTRAL_APOLLO11.md). Os números e pacotes da seção seguinte continuam pertencendo exclusivamente à edição `.2`.
+
+## Histórico: atualização apollo11.2
 
 Na edição `1.5.3-apollo11.2`, os nomes visíveis passam a ser Suporte Apollo11 nos atalhos Windows e Apollo11 no aviso da bandeja. O EXE externo do pacote de entrega se chama `Suporte Apollo11.exe`. O núcleo RustDesk mantém a versão `1.5.3`.
 

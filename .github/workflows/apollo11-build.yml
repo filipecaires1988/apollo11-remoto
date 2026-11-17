@@ -1,7 +1,10 @@
 # Derived from RustDesk 1.5.3. Identity, transport and server defaults unchanged.
-# Manual unsigned builds only; requires the corresponding source ZIP to be hosted first.
+# Unsigned builds; every run requires a public archive of its corresponding source.
 name: Apollo11 Remoto | Windows e Mac
 'on':
+  push:
+    branches:
+    - apollo11-central
   workflow_dispatch:
     inputs:
       source_url:
@@ -28,7 +31,7 @@ env:
   VCPKG_COMMIT_ID: 9e593bb18ea69cc5095e012465dcd675a822ed0d
   VCPKG_CMAKE_VERSION: 4.3.0
   VERSION: 1.5.3
-  APOLLO11_SOURCE_URL: ${{ inputs.source_url }}
+  APOLLO11_SOURCE_URL: ${{ inputs.source_url || format('https://github.com/filipecaires1988/apollo11-remoto/archive/{0}.zip', github.sha) }}
 jobs:
   validate-source:
     name: Verificar o endereço dos fontes
@@ -257,7 +260,7 @@ jobs:
             Write-Host "Ingore the printer driver error."
         }
     - name: Run the Rust tests
-      if: ${{ inputs.run-tests }}
+      if: ${{ github.event_name == 'push' || inputs.run-tests }}
       shell: bash
       run: |
         # The build's own features, so the tests see the code that ships.
@@ -418,7 +421,7 @@ jobs:
         name: ${{ matrix.job.arch == 'aarch64' && 'bridge-artifact-flutter-3.44' || 'bridge-artifact' }}
         path: ./
     - name: Run the Dart tests
-      if: ${{ inputs.run-tests }}
+      if: ${{ github.event_name == 'push' || inputs.run-tests }}
       working-directory: flutter
       run: flutter test --timeout 60s
     - name: Setup vcpkg with Github Actions binary cache
@@ -462,7 +465,7 @@ jobs:
         fi
         ./build.py --flutter --hwcodec --unix-file-copy-paste ${{ matrix.job.extra-build-args }}
     - name: Run the Rust tests
-      if: ${{ inputs.run-tests && matrix.job.arch == 'aarch64' }}
+      if: ${{ (github.event_name == 'push' || inputs.run-tests) && matrix.job.arch == 'aarch64' }}
       run: |
         # The build's own features, so the tests see the code that ships. MACOSX_DEPLOYMENT_TARGET
         # comes from the build step's export.
