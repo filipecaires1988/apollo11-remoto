@@ -4,9 +4,9 @@ Esta edição aplica a identidade visual da Apollo11 ao RustDesk **1.5.3**. A pa
 
 O nome mostrado na interface, a logo, os ícones e as cores podem mudar. Os nomes internos `RustDesk`, `rustdesk.exe`, `librustdesk.dll`, o serviço e o identificador do aplicativo Mac são preservados. Isso mantém os caminhos de configuração e a identidade da instalação existente. Esta edição não deve ser tratada como um segundo serviço para instalar ao lado do RustDesk oficial.
 
-A edição apollo11.2 acrescenta os nomes Suporte Apollo11 nos atalhos Windows e Apollo11 no aviso da bandeja. A nova compilação ainda será executada. Os resultados abaixo pertencem à edição anterior, apollo11.1.
+A edição `1.5.3-apollo11.2` acrescenta os nomes Suporte Apollo11 nos atalhos Windows e Apollo11 no aviso da bandeja. O EXE externo do pacote de entrega se chama `Suporte Apollo11.exe`. O núcleo continua na versão `1.5.3`.
 
-A [execução de compilação nativa](https://github.com/filipecaires1988/apollo11-remoto/actions/runs/44009980042) produziu o EXE Windows x64 e os DMGs Mac Intel e Mac Apple Silicon. Os três trabalhos nativos e a execução completa concluíram com sucesso. Os três arquivos nativos foram baixados e conferidos; os testes de interface, instalação e conexão real continuam pendentes.
+A [execução da edição .2 foi concluída](https://github.com/filipecaires1988/apollo11-remoto/actions/runs/44021193167), com sucesso nos três trabalhos nativos e na execução completa. Os arquivos nativos das três plataformas foram baixados e conferidos. Os resultados atuais e os da execução anterior estão separados abaixo. Os testes de interface gráfica, instalação, migração e conexão real continuam pendentes.
 
 ## Arquivos de compilação
 
@@ -27,7 +27,7 @@ O workflow foi reduzido a partir do arquivo oficial do tag `1.5.3`. Ele conserva
 1. Use a raiz do [repositório público Apollo11 Remoto](https://github.com/filipecaires1988/apollo11-remoto), que já contém os fontes completos do tag `1.5.3`, a personalização e a biblioteca `hbb_common` no commit registrado.
 2. Mantenha `Cargo.toml` na raiz. Nesta cópia, `libs/hbb_common` é uma pasta normal, incluída integralmente. Não recrie `.gitmodules` nem a transforme em um gitlink vazio.
 3. Para uma nova compilação, abra **Actions** e escolha **Apollo11 Remoto | Windows e Mac**.
-4. Use uma URL HTTPS pública do ZIP completo dos fontes do commit que será compilado. O endereço precisa abrir o arquivo diretamente, sem login. O `README.md` indica o ZIP com commit fixado da compilação entregue.
+4. Use uma URL HTTPS pública do ZIP completo dos fontes do commit que será compilado. O endereço precisa abrir o arquivo diretamente, sem login. Para a edição .2, use os [fontes do commit 020b2014ed3e8e8e7d573412fc7e7a5797fdb52d](https://github.com/filipecaires1988/apollo11-remoto/archive/020b2014ed3e8e8e7d573412fc7e7a5797fdb52d.zip).
 5. Clique em **Run workflow** e preencha `source_url` com esse endereço real. A opção de executar os testes oficiais vem ligada por padrão.
 6. Aguarde os trabalhos Windows e Mac terminarem. Eles precisam baixar e compilar várias dependências. O limite configurado para cada trabalho nativo é de três horas.
 7. Ao terminar, abra a execução e baixe os arquivos em **Artifacts**.
@@ -42,6 +42,8 @@ Se estiver usando uma cópia completa do repositório oficial, desative ou remov
 
 ## Arquivos produzidos
 
+Os nomes dos artefatos e arquivos gerados pelo workflow abaixo não mudam na edição .2. Eles usam a versão do núcleo `1.5.3`; identifique a edição pela execução e pelo commit dos fontes.
+
 | Artefato | Conteúdo |
 |---|---|
 | `Apollo11-Windows-x64-unsigned` | `Apollo11_Remoto-1.5.3-windows-x64.exe`, autoextraível, e `SHA256SUMS.txt`. |
@@ -52,7 +54,7 @@ Se estiver usando uma cópia completa do repositório oficial, desative ou remov
 
 O aplicativo dentro dos DMGs continua se chamando `RustDesk.app`. Os arquivos externos e a interface identificam a edição Apollo11. Não há MSI nesta primeira rotina reduzida.
 
-Os ZIPs preparados para entrega incluem o EXE ou DMG, sua soma SHA-256, a licença integral `LICENCE` e `LEIA_PRIMEIRO.txt`. Eles preservam o arquivo nativo gerado pela compilação.
+Após a conferência dos arquivos da edição .2, foram preparados os ZIPs `Suporte_Apollo11_1.5.3_apollo11.2_<sistema>.zip`. Cada um contém quatro entradas: EXE ou DMG, `SHA256SUMS.txt`, `LICENCE` integral e `LEIA_PRIMEIRO.txt`. O manifesto contém os hashes do arquivo nativo, da licença e das instruções. No ZIP Windows, o arquivo externo foi renomeado para `Suporte Apollo11.exe`, preservando os bytes e o SHA-256 da origem. O executável instalado continua com a identidade interna RustDesk.
 
 O ZIP dos fontes indicado em `source_url` precisa estar realmente hospedado antes de compilar e deve permanecer acessível a quem receber o programa. O artefato de fontes criado pela rotina é uma cópia adicional da árvore usada na execução; ele não publica o arquivo no seu site nem preenche a URL automaticamente.
 
@@ -77,7 +79,22 @@ Os artefatos gerados ficam disponíveis por 30 dias na execução. Guarde os bin
 
 O projeto de origem usa versões diferentes do Flutter para manter a compatibilidade das plataformas. Trocar tudo por uma versão mais nova sem adaptar o código pode impedir a compilação.
 
-## Testes da execução anterior (apollo11.1)
+## Verificação concluída da edição apollo11.2
+
+Resultados da [execução 44021193167](https://github.com/filipecaires1988/apollo11-remoto/actions/runs/44021193167), concluída com sucesso:
+
+| Plataforma | Estado |
+|---|---|
+| Windows x64 | Build concluído; 253 testes da biblioteca Rust e 2 de clipboard aprovados, sem falhas nem ignorados. Testes de documentação: 0 casos. |
+| Mac Intel | Build concluído; 173 testes Dart aprovados, 1 ignorado e nenhuma falha. |
+| Mac Apple Silicon | Build concluído; 450 testes aprovados, 1 ignorado e nenhuma falha: 173 testes Dart, 255 da biblioteca Rust e 22 de clipboard aprovados. |
+| As três plataformas | Executável nativo informou a versão `1.5.3` pela linha de comando. |
+
+Os três trabalhos nativos e a execução completa concluíram com sucesso. Os arquivos nativos foram baixados e validados por digest do ZIP informado pelo GitHub, CRC de suas entradas e SHA-256. A estrutura PE64 do EXE Windows e a assinatura de formato UDIF dos DMGs também foram conferidas. Essa assinatura de formato não é uma assinatura digital de editor.
+
+Os ZIPs finais contêm as quatro entradas descritas acima, preservando os bytes dos arquivos nativos. Essas verificações não incluem uso da interface gráfica, instalação ou atualização sobre uma instalação existente, migração real dos atalhos nem conexão remota entre dois computadores.
+
+## Histórico de testes da edição anterior (apollo11.1)
 
 Na [execução registrada](https://github.com/filipecaires1988/apollo11-remoto/actions/runs/44009980042), foram conferidos os seguintes resultados:
 
@@ -97,6 +114,8 @@ Essas verificações comprovam a geração e a integridade dos arquivos. A inter
 Os padrões de rede e o protocolo não são alterados. A edição pode tentar conectar aos IDs dos clientes que usam os mesmos servidores configurados no RustDesk original. O serviço público não pertence à Apollo11; a disponibilidade e as condições dele dependem do operador. Caso seu RustDesk já use outro servidor, a configuração existente precisa ser a mesma dos clientes.
 
 Como a identidade interna continua RustDesk, IDs, senhas e endereços de servidor usam os caminhos existentes. Nenhum ID, senha permanente ou endereço de cliente foi colocado nos fontes. Uma atualização pelo programa oficial pode restaurar o visual original. Para manter a edição visual, será necessário recompilar as alterações sobre a versão desejada e validar a atualização.
+
+Na edição .2, os atalhos criados no Desktop e no Menu Iniciar passam a usar Suporte Apollo11. A migração durante a atualização só atua em instalações reconhecidas como EXE e em atalhos legados ainda existentes nos caminhos padrão. Não recria atalhos removidos e não migra instalações MSI ou de tipo incerto nem atalhos manuais, fixados ou de outros perfis. A instalação EXE sobre MSI continua bloqueada pelo fluxo original. O atalho interno de inicialização do serviço não mudou.
 
 ## Assinatura e permissões
 

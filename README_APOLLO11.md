@@ -4,7 +4,11 @@ Esta preparação atende ao uso da Apollo11 no suporte aos seus próprios client
 
 ## Atualização apollo11.2
 
-Os nomes visíveis passam a ser Suporte Apollo11 nos atalhos Windows e Apollo11 no aviso da bandeja. A nova compilação está sendo preparada. O estado abaixo descreve a edição anterior, apollo11.1.
+Na edição `1.5.3-apollo11.2`, os nomes visíveis passam a ser Suporte Apollo11 nos atalhos Windows e Apollo11 no aviso da bandeja. O EXE externo do pacote de entrega se chama `Suporte Apollo11.exe`. O núcleo RustDesk mantém a versão `1.5.3`.
+
+A [compilação da edição .2 foi concluída](https://github.com/filipecaires1988/apollo11-remoto/actions/runs/44021193167), com sucesso nos três trabalhos nativos e na execução completa. No Windows, 255 testes foram aprovados, sem falhas nem ignorados. Mac Intel teve 173 testes aprovados e 1 ignorado; Mac Apple Silicon teve 450 aprovados e 1 ignorado, sem falhas. A versão `1.5.3` foi confirmada pela linha de comando nas três plataformas. Os três arquivos nativos foram baixados e conferidos por digest do ZIP informado pelo GitHub, CRC, SHA-256 e estrutura PE64/UDIF.
+
+Os [fontes da edição .2 estão fixados no commit correspondente](https://github.com/filipecaires1988/apollo11-remoto/archive/020b2014ed3e8e8e7d573412fc7e7a5797fdb52d.zip). Os ZIPs de entrega foram preparados com quatro arquivos: EXE ou DMG, `SHA256SUMS.txt` com os hashes dos outros três arquivos, `LICENCE` integral e `LEIA_PRIMEIRO.txt`. Os bytes dos arquivos nativos foram preservados, inclusive o SHA-256 do EXE externo agora chamado `Suporte Apollo11.exe`. Os nomes dos artefatos do workflow continuam iguais aos anteriores; a execução identifica a edição. Os pacotes de entrega usam o padrão `Suporte_Apollo11_1.5.3_apollo11.2_<sistema>.zip`.
 
 ## Estado da edição anterior
 
@@ -41,7 +45,7 @@ O workflow manual `.github/workflows/apollo11-build.yml` prepara as versões Win
 
 O ZIP público dos fontes desta compilação está indicado em `README.md`, com o commit fixado. O endereço informado em `source_url` é incluído no botão **Código-fonte desta edição** na tela Sobre. Em uma nova compilação, use os fontes do commit realmente compilado e mantenha esse endereço acessível aos usuários.
 
-O repositório foi publicado e os três builds concluíram com sucesso. Os resultados dos testes e das verificações estão em `README_BUILD.md`. Novas execuções podem consumir minutos e armazenamento da conta GitHub.
+O repositório foi publicado e as execuções das edições .1 e .2 concluíram com sucesso. Os resultados de cada edição estão separados em `README_BUILD.md`. Novas execuções podem consumir minutos e armazenamento da conta GitHub.
 
 Os binários gerados por esse fluxo não recebem assinatura de editor Windows nem Developer ID ou notarização Apple. Sua distribuição final exige conferir a execução e as permissões em Windows e Mac reais.
 
@@ -52,6 +56,12 @@ Atender os próprios clientes é compatível com a finalidade desta edição. En
 O arquivo `LICENCE`, na raiz deste repositório, contém a licença AGPL-3.0. Os créditos originais foram preservados. Entregue o código completo correspondente e as instruções de compilação junto da edição; o acesso remoto aos fontes também precisa ficar disponível pelo endereço informado na compilação. O arquivo `MODIFICACOES_APOLLO11.md` registra os arquivos e caminhos alterados.
 
 ## Atualizações
+
+No Windows, abra `Suporte Apollo11.exe` e instale o programa ou use **Clique para atualizar**, quando esse botão aparecer. Encerre e abra o aplicativo novamente para carregar o novo nome na bandeja.
+
+Os atalhos criados na Área de Trabalho e no Menu Iniciar usam **Suporte Apollo11**. A atualização renomeia atalhos antigos existentes nos caminhos padrão somente quando a instalação é reconhecida como EXE. Atalhos removidos não são recriados. Instalações MSI ou de tipo incerto e atalhos manuais, fixados ou de outros perfis não são migrados. A instalação EXE sobre uma instalação MSI continua bloqueada pelo fluxo original.
+
+No Mac, o pacote continua sendo um DMG com `RustDesk.app`. As permissões de Gravação de Tela e Acessibilidade continuam necessárias, e a identificação da bandeja usa Apollo11.
 
 O comportamento de atualização oficial foi preservado. Uma atualização oficial pode restaurar a identidade visual do RustDesk. Para manter a edição Apollo11 em uma nova versão, reaplique as modificações na nova base, compile e teste novamente.
 
