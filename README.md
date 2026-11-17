@@ -4,7 +4,11 @@ Edição visual da Apollo11 para atendimento aos seus próprios clientes, basead
 
 Inclui logo original, cores azul escuro e amarelo, nome visual Apollo11 Remoto e ícones para Windows e Mac. A identidade interna do aplicativo, a configuração de rede e o protocolo do RustDesk foram preservados.
 
-## Instaladores
+## Atualização apollo11.2
+
+O atalho Windows passa a se chamar **Suporte Apollo11** e o aviso da bandeja usa **Apollo11**. A nova compilação está sendo preparada. Os resultados e fontes abaixo são da primeira edição, apollo11.1.
+
+## Instaladores da edição anterior
 
 O [repositório público](https://github.com/filipecaires1988/apollo11-remoto) já está disponível. A [execução de compilação Windows e Mac](https://github.com/filipecaires1988/apollo11-remoto/actions/runs/44009980042) produziu os arquivos nativos para Windows x64, Mac Intel e Mac Apple Silicon. Os três artefatos foram baixados e conferidos por integridade do ZIP, SHA-256 dos arquivos e estrutura dos formatos PE64/DMG. A versão `1.5.3` foi confirmada nos ambientes nativos de compilação.
 

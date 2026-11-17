@@ -1692,7 +1692,7 @@ pub fn install_me(options: &str, path: String, silent: bool, debug: bool) -> Res
     let mut shortcuts = Default::default();
     if options.contains("desktopicon") {
         shortcuts = format!(
-            "copy /Y \"{}\\{}.lnk\" \"%PUBLIC%\\Desktop\\\"",
+            "copy /Y \"{}\\{}.lnk\" \"%PUBLIC%\\Desktop\\Suporte Apollo11.lnk\"",
             tmp_path,
             crate::get_app_name()
         );
@@ -1702,7 +1702,7 @@ pub fn install_me(options: &str, path: String, silent: bool, debug: bool) -> Res
         shortcuts = format!(
             "{shortcuts}
 md \"{start_menu}\"
-copy /Y \"{tmp_path}\\{app_name}.lnk\" \"{start_menu}\\\"
+copy /Y \"{tmp_path}\\{app_name}.lnk\" \"{start_menu}\\Suporte Apollo11.lnk\"
 copy /Y \"{tmp_path}\\Uninstall {app_name}.lnk\" \"{start_menu}\\\"
      "
         );
@@ -1903,6 +1903,7 @@ fn get_uninstall(kill_self: bool, uninstall_printer: bool) -> ResultType<String>
     if exist \"{path}\" rd /s /q \"{path}\"
     if exist \"{start_menu}\" rd /s /q \"{start_menu}\"
     if exist \"%PUBLIC%\\Desktop\\{app_name}.lnk\" del /f /q \"%PUBLIC%\\Desktop\\{app_name}.lnk\"
+    if exist \"%PUBLIC%\\Desktop\\Suporte Apollo11.lnk\" del /f /q \"%PUBLIC%\\Desktop\\Suporte Apollo11.lnk\"
     if exist \"%PROGRAMDATA%\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\{app_name} Tray.lnk\" del /f /q \"%PROGRAMDATA%\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\{app_name} Tray.lnk\"
     ",
         before_uninstall=get_before_uninstall(kill_self)?,
@@ -3505,7 +3506,7 @@ fn get_directory_size_kb(path: &str) -> u64 {
 pub fn update_me(debug: bool) -> ResultType<()> {
     let app_name = crate::get_app_name();
     let src_exe = std::env::current_exe()?.to_string_lossy().to_string();
-    let (subkey, path, _, exe) = get_install_info();
+    let (subkey, path, start_menu, exe) = get_install_info();
     let is_installed = std::fs::metadata(&exe).is_ok();
     if !is_installed {
         bail!("{} is not installed.", &app_name);
@@ -3648,6 +3649,16 @@ reg add {subkey} /f /v EstimatedSize /t REG_DWORD /d {size}
     // while I cannot find them by `tasklist` or the methods above.
     // There's should be 4 processes running: service, server, tray and main window.
     // But only 2 processes are shown in the tasklist.
+    let shortcut_rename_commands = if is_msi == Some(false) {
+        format!(
+            "
+if exist \"%PUBLIC%\\Desktop\\{app_name}.lnk\" move /Y \"%PUBLIC%\\Desktop\\{app_name}.lnk\" \"%PUBLIC%\\Desktop\\Suporte Apollo11.lnk\"
+if exist \"{start_menu}\\{app_name}.lnk\" move /Y \"{start_menu}\\{app_name}.lnk\" \"{start_menu}\\Suporte Apollo11.lnk\"
+"
+        )
+    } else {
+        String::new()
+    };
     let cmds = format!(
         "
 chcp 65001
@@ -3657,6 +3668,7 @@ taskkill /F /IM {app_name}.exe{filter}
 {copy_exe}
 {rename_exe}
 {remove_meta_toml}
+{shortcut_rename_commands}
 {restore_service_cmd}
 {uninstall_printer_cmd}
 {install_printer_cmd}

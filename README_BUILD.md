@@ -4,6 +4,8 @@ Esta edição aplica a identidade visual da Apollo11 ao RustDesk **1.5.3**. A pa
 
 O nome mostrado na interface, a logo, os ícones e as cores podem mudar. Os nomes internos `RustDesk`, `rustdesk.exe`, `librustdesk.dll`, o serviço e o identificador do aplicativo Mac são preservados. Isso mantém os caminhos de configuração e a identidade da instalação existente. Esta edição não deve ser tratada como um segundo serviço para instalar ao lado do RustDesk oficial.
 
+A edição apollo11.2 acrescenta os nomes Suporte Apollo11 nos atalhos Windows e Apollo11 no aviso da bandeja. A nova compilação ainda será executada. Os resultados abaixo pertencem à edição anterior, apollo11.1.
+
 A [execução de compilação nativa](https://github.com/filipecaires1988/apollo11-remoto/actions/runs/44009980042) produziu o EXE Windows x64 e os DMGs Mac Intel e Mac Apple Silicon. Os três trabalhos nativos e a execução completa concluíram com sucesso. Os três arquivos nativos foram baixados e conferidos; os testes de interface, instalação e conexão real continuam pendentes.
 
 ## Arquivos de compilação
@@ -75,7 +77,7 @@ Os artefatos gerados ficam disponíveis por 30 dias na execução. Guarde os bin
 
 O projeto de origem usa versões diferentes do Flutter para manter a compatibilidade das plataformas. Trocar tudo por uma versão mais nova sem adaptar o código pode impedir a compilação.
 
-## Testes da execução
+## Testes da execução anterior (apollo11.1)
 
 Na [execução registrada](https://github.com/filipecaires1988/apollo11-remoto/actions/runs/44009980042), foram conferidos os seguintes resultados:
 

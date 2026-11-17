@@ -2,7 +2,11 @@
 
 Esta preparação atende ao uso da Apollo11 no suporte aos seus próprios clientes. A base é o cliente aberto RustDesk 1.5.3, com identidade visual Apollo11. O cliente Server Pro e seu gerador pago não fazem parte desta preparação.
 
-## Estado desta entrega
+## Atualização apollo11.2
+
+Os nomes visíveis passam a ser Suporte Apollo11 nos atalhos Windows e Apollo11 no aviso da bandeja. A nova compilação está sendo preparada. O estado abaixo descreve a edição anterior, apollo11.1.
+
+## Estado da edição anterior
 
 O código personalizado está no [repositório público da Apollo11](https://github.com/filipecaires1988/apollo11-remoto). A [execução de compilação nativa de Windows e Mac](https://github.com/filipecaires1988/apollo11-remoto/actions/runs/44009980042) produziu um EXE para Windows x64 e DMGs para Mac Intel e Mac Apple Silicon. Os três artefatos foram baixados e conferidos por digest do ZIP informado pelo GitHub, CRC, SHA-256 dos arquivos nativos e estrutura PE64/DMG. A versão `1.5.3` foi confirmada pela linha de comando nos ambientes nativos de compilação.
 
