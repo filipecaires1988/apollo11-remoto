@@ -19,7 +19,7 @@ permissions:
   contents: read
 concurrency:
   group: apollo11-native-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: ${{ github.event_name == 'push' }}
 env:
   SCITER_RUST_VERSION: '1.75'
   RUST_VERSION: '1.75'

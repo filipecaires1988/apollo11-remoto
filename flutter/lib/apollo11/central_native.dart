@@ -35,7 +35,7 @@ class _NativeCentralRuntime implements CentralRuntime {
   @override
   Future<String> linkedEndpoint() async {
     final token = await bind.mainGetOption(key: 'apollo11-central-token');
-    return token.isEmpty ? '' : bind.mainGetOption(key: 'apollo11-central-url');
+    return token.isEmpty ? '' : await bind.mainGetOption(key: 'apollo11-central-url');
   }
 
   @override
