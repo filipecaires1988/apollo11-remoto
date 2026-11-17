@@ -28,9 +28,13 @@ jobs:
       - name: Testar a API com banco temporário
         run: python3 central-server/tests/integration.py
   catalog:
-    name: Cadastro local e cliente da API
+    name: Central Apollo11 com Flutter ${{ matrix.flutter-version }}
     runs-on: ubuntu-24.04
     timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        flutter-version: ['3.24.5', '3.44.9']
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
         with:
@@ -38,7 +42,7 @@ jobs:
       - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2
         with:
           channel: stable
-          flutter-version: '3.24.5'
+          flutter-version: ${{ matrix.flutter-version }}
           cache: true
       - name: Instalar as dependências existentes
         working-directory: flutter

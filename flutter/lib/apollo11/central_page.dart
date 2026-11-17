@@ -313,61 +313,65 @@ class _CentralPageState extends State<CentralPage> {
           .toList();
       if (devices.isEmpty && (_favoritesOnly || !groupMatches)) continue;
       final expanded = _expanded.contains(group.id) || query.isNotEmpty;
-      children.add(Container(
-        margin: const EdgeInsets.only(bottom: 9),
-        decoration: BoxDecoration(
-            color: _panel, borderRadius: BorderRadius.circular(10)),
-        child: Column(children: [
-          ListTile(
-            dense: true,
-            contentPadding: const EdgeInsets.only(left: 8, right: 4),
-            leading: Icon(expanded ? Icons.expand_more : Icons.chevron_right,
-                color: _yellow),
-            title: Text(group.name,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(fontWeight: FontWeight.w700)),
-            subtitle: Text('${devices.length} computadores',
-                style: const TextStyle(fontSize: 11, color: _muted)),
-            onTap: () => setState(() => _expanded.contains(group.id)
-                ? _expanded.remove(group.id)
-                : _expanded.add(group.id)),
-            trailing: PopupMenuButton<String>(
-              tooltip: 'Opções do cliente',
-              enabled: _writable,
-              onSelected: (value) {
-                if (value == 'add') _editDevice(group: group);
-                if (value == 'rename') _editGroup(group);
-                if (value == 'delete') _deleteGroup(group);
-                if (value == 'invite') _invite(group);
-              },
-              itemBuilder: (_) => [
-                const PopupMenuItem(
-                    value: 'add', child: Text('Adicionar computador')),
-                if (_online)
-                  const PopupMenuItem(
-                      value: 'invite',
-                      child: Text('Criar convite para vínculo automático')),
-                const PopupMenuItem(
-                    value: 'rename', child: Text('Renomear cliente')),
-                const PopupMenuItem(
-                    value: 'delete', child: Text('Excluir cliente')),
+      children.add(Padding(
+          padding: const EdgeInsets.only(bottom: 9),
+          child: Material(
+            color: _panel,
+            borderRadius: BorderRadius.circular(10),
+            clipBehavior: Clip.antiAlias,
+            child: Column(children: [
+              ListTile(
+                dense: true,
+                contentPadding: const EdgeInsets.only(left: 8, right: 4),
+                leading: Icon(
+                    expanded ? Icons.expand_more : Icons.chevron_right,
+                    color: _yellow),
+                title: Text(group.name,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontWeight: FontWeight.w700)),
+                subtitle: Text('${devices.length} computadores',
+                    style: const TextStyle(fontSize: 11, color: _muted)),
+                onTap: () => setState(() => _expanded.contains(group.id)
+                    ? _expanded.remove(group.id)
+                    : _expanded.add(group.id)),
+                trailing: PopupMenuButton<String>(
+                  tooltip: 'Opções do cliente',
+                  enabled: _writable,
+                  onSelected: (value) {
+                    if (value == 'add') _editDevice(group: group);
+                    if (value == 'rename') _editGroup(group);
+                    if (value == 'delete') _deleteGroup(group);
+                    if (value == 'invite') _invite(group);
+                  },
+                  itemBuilder: (_) => [
+                    const PopupMenuItem(
+                        value: 'add', child: Text('Adicionar computador')),
+                    if (_online)
+                      const PopupMenuItem(
+                          value: 'invite',
+                          child: Text('Criar convite para vínculo automático')),
+                    const PopupMenuItem(
+                        value: 'rename', child: Text('Renomear cliente')),
+                    const PopupMenuItem(
+                        value: 'delete', child: Text('Excluir cliente')),
+                  ],
+                ),
+              ),
+              if (expanded) ...[
+                const Divider(height: 1),
+                if (devices.isEmpty)
+                  Padding(
+                      padding: const EdgeInsets.all(14),
+                      child: TextButton.icon(
+                          onPressed: _writable
+                              ? () => _editDevice(group: group)
+                              : null,
+                          icon: const Icon(Icons.add),
+                          label: const Text('Adicionar computador'))),
+                ...devices.map(_deviceRow),
               ],
-            ),
-          ),
-          if (expanded) ...[
-            const Divider(height: 1),
-            if (devices.isEmpty)
-              Padding(
-                  padding: const EdgeInsets.all(14),
-                  child: TextButton.icon(
-                      onPressed:
-                          _writable ? () => _editDevice(group: group) : null,
-                      icon: const Icon(Icons.add),
-                      label: const Text('Adicionar computador'))),
-            ...devices.map(_deviceRow),
-          ],
-        ]),
-      ));
+            ]),
+          )));
     }
     if (children.isEmpty) {
       return Center(
