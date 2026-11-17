@@ -1,0 +1,17 @@
+{
+  "display_name": "Apollo11 Remoto",
+  "edition": "1.5.3-apollo11.1",
+  "upstream": "https://github.com/rustdesk/rustdesk",
+  "upstream_tag": "1.5.3",
+  "upstream_commit": "95cca3f661f635b3cc85c04935fe8d96d8f432ef",
+  "submodule_hbb_common_commit": "fae47e024dd83cef6aaecde0aa7d11731df11649",
+  "logo_source": "https://apollo11.com.br/wp-content/plugins/apollo11-sites-apps/assets/logo-apollo11.png",
+  "logo_sha256": "7f527a881d587683a955b55ef0d169f96d9218ada26b371b0472d619473e9925",
+  "colors": {
+    "background": "#020b15",
+    "panel": "#061522",
+    "accent": "#ffbf16"
+  },
+  "internal_identity": "RustDesk",
+  "network_defaults": "unchanged"
+}

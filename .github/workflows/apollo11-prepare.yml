@@ -1,0 +1,184 @@
+name: Preparar fontes completos Apollo11
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: apollo11-prepare-main
+  cancel-in-progress: false
+
+env:
+  APOLLO11_UPSTREAM_SHA: 95cca3f661f635b3cc85c04935fe8d96d8f432ef
+  APOLLO11_HBB_SHA: fae47e024dd83cef6aaecde0aa7d11731df11649
+
+jobs:
+  prepare-source:
+    name: Importar a base fixa e aplicar o visual enviado
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    steps:
+      - name: Confirmar o repositório e a branch
+        shell: bash
+        run: |
+          test "$GITHUB_REPOSITORY" = 'filipecaires1988/apollo11-remoto'
+          test "$GITHUB_REF" = 'refs/heads/main'
+
+      - name: Checkout do overlay autorizado
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          ref: main
+          fetch-depth: 1
+          persist-credentials: true
+
+      - name: Buscar os dois commits oficiais fixados
+        shell: bash
+        run: |
+          upstream_dir="$RUNNER_TEMP/apollo11-upstream"
+          hbb_dir="$RUNNER_TEMP/apollo11-hbb-common"
+          git init -q "$upstream_dir"
+          git -C "$upstream_dir" remote add origin https://github.com/rustdesk/rustdesk.git
+          git -C "$upstream_dir" -c protocol.file.allow=never fetch --no-tags --depth=1 origin "$APOLLO11_UPSTREAM_SHA"
+          git -C "$upstream_dir" checkout -q --detach FETCH_HEAD
+          test "$(git -C "$upstream_dir" rev-parse HEAD)" = "$APOLLO11_UPSTREAM_SHA"
+          git init -q "$hbb_dir"
+          git -C "$hbb_dir" remote add origin https://github.com/rustdesk/hbb_common.git
+          git -C "$hbb_dir" -c protocol.file.allow=never fetch --no-tags --depth=1 origin "$APOLLO11_HBB_SHA"
+          git -C "$hbb_dir" checkout -q --detach FETCH_HEAD
+          test "$(git -C "$hbb_dir" rev-parse HEAD)" = "$APOLLO11_HBB_SHA"
+
+      - name: Montar os fontes sem executar o código importado
+        shell: bash
+        run: |
+          python3 - <<'PY_PREPARE'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+          import re
+          import shutil
+          import subprocess
+
+          workspace = Path(os.environ['GITHUB_WORKSPACE']).resolve()
+          temporary = Path(os.environ['RUNNER_TEMP']).resolve()
+          upstream = temporary / 'apollo11-upstream'
+          hbb = temporary / 'apollo11-hbb-common'
+          assembled = temporary / 'apollo11-assembled'
+          expected_upstream = os.environ['APOLLO11_UPSTREAM_SHA']
+          expected_hbb = os.environ['APOLLO11_HBB_SHA']
+          for value in (expected_upstream, expected_hbb):
+              if not re.fullmatch(r'[0-9a-f]{40}', value):
+                  raise RuntimeError('Commit fixado inválido.')
+
+          def git_text(repo, *arguments):
+              return subprocess.check_output(['git', '-C', str(repo), *arguments], text=True).strip()
+
+          if git_text(upstream, 'rev-parse', 'HEAD') != expected_upstream:
+              raise RuntimeError('O commit RustDesk não corresponde ao esperado.')
+          if git_text(hbb, 'rev-parse', 'HEAD') != expected_hbb:
+              raise RuntimeError('O commit hbb_common não corresponde ao esperado.')
+          gitlink = git_text(upstream, 'ls-tree', 'HEAD', 'libs/hbb_common').split()
+          if gitlink != ['160000', 'commit', expected_hbb, 'libs/hbb_common']:
+              raise RuntimeError('O submódulo da base RustDesk não aponta para o hbb_common esperado.')
+
+          def workflow_hashes(root):
+              folder = root / '.github' / 'workflows'
+              result = {}
+              if folder.is_dir():
+                  for path in sorted(folder.rglob('*')):
+                      if path.is_file():
+                          result[path.relative_to(root).as_posix()] = hashlib.sha256(path.read_bytes()).hexdigest()
+              return result
+
+          original_workflows = workflow_hashes(workspace)
+          required = {
+              '.github/workflows/apollo11-prepare.yml',
+              '.github/workflows/apollo11-build.yml',
+              '.github/workflows/bridge.yml',
+              '.github/workflows/third-party-RustDeskTempTopMostWindow.yml',
+          }
+          if not required.issubset(original_workflows):
+              raise RuntimeError('O checkout ainda não contém os quatro workflows Apollo11 necessários.')
+
+          def ignore_git(directory, names):
+              return {name for name in names if name in {'.git', '.gitmodules'}}
+
+          def ignore_upstream(directory, names):
+              ignored = ignore_git(directory, names)
+              if Path(directory) == upstream / '.github':
+                  ignored.add('workflows')
+              return ignored
+
+          if assembled.exists():
+              raise RuntimeError('A pasta temporária de montagem já existe; a importação foi interrompida.')
+          shutil.copytree(upstream, assembled, symlinks=True, ignore=ignore_upstream)
+          hbb_destination = assembled / 'libs' / 'hbb_common'
+          if hbb_destination.exists():
+              shutil.rmtree(hbb_destination)
+          shutil.copytree(hbb, hbb_destination, symlinks=True, ignore=ignore_git)
+          # Every file already reviewed and uploaded to main is the authoritative overlay.
+          shutil.copytree(workspace, assembled, dirs_exist_ok=True, symlinks=True, ignore=ignore_git)
+
+          def preserve_executable_modes(repo, destination):
+              tree = subprocess.check_output(['git', '-C', str(repo), 'ls-tree', '-r', '-z', 'HEAD'])
+              for entry in tree.split(b'\0'):
+                  if not entry:
+                      continue
+                  header, filename = entry.split(b'\t', 1)
+                  if header.split()[0] != b'100755':
+                      continue
+                  path = destination / os.fsdecode(filename)
+                  if path.is_file() and not path.is_symlink():
+                      path.chmod(path.stat().st_mode | 0o111)
+
+          preserve_executable_modes(upstream, assembled)
+          preserve_executable_modes(hbb, hbb_destination)
+          if workflow_hashes(assembled) != original_workflows:
+              raise RuntimeError('Um workflow enviado foi alterado ou um workflow upstream foi reintroduzido.')
+          for path in assembled.rglob('*'):
+              if path.name in {'.git', '.gitmodules'}:
+                  raise RuntimeError('Um diretório Git ou arquivo de submódulos permaneceu na montagem.')
+          for relative in ('Cargo.toml', 'Cargo.lock', 'build.py', 'flutter/pubspec.yaml',
+                           'libs/hbb_common/Cargo.toml', 'libs/hbb_common/protos/rendezvous.proto'):
+              if not (assembled / relative).is_file():
+                  raise RuntimeError('Arquivo obrigatório ausente: ' + relative)
+
+          # Keep the checked-out repository and its scoped GitHub credentials intact.
+          for child in workspace.iterdir():
+              if child.name == '.git':
+                  continue
+              if child.is_dir() and not child.is_symlink():
+                  shutil.rmtree(child)
+              else:
+                  child.unlink()
+          shutil.copytree(assembled, workspace, dirs_exist_ok=True, symlinks=True)
+          if workflow_hashes(workspace) != original_workflows:
+              raise RuntimeError('Os workflows não foram preservados ao copiar a árvore final.')
+          print('Fontes montados. RustDesk:', expected_upstream, 'hbb_common:', expected_hbb)
+          print('Workflows preservados:', len(original_workflows))
+          print('Arquivos de fontes:', sum(1 for path in assembled.rglob('*') if path.is_file()))
+          PY_PREPARE
+
+      - name: Registrar os fontes completos na main
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          # The imported snapshot must retain upstream-tracked files even if its .gitignore matches them.
+          git add --force --all
+          if git diff --cached --quiet; then
+            echo 'Os fontes completos já estão presentes; nenhum novo commit foi necessário.'
+          else
+            git commit -q -m 'Importar RustDesk 1.5.3 completo com o visual Apollo11'
+            git push origin HEAD:main
+          fi
+          prepared_sha="$(git rev-parse HEAD)"
+          {
+            echo '### Fontes Apollo11 preparados'
+            echo
+            echo "Commit completo: \`$prepared_sha\`"
+            echo
+            echo "ZIP público: https://github.com/$GITHUB_REPOSITORY/archive/$prepared_sha.zip"
+          } >> "$GITHUB_STEP_SUMMARY"
