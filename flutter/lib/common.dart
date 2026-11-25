@@ -181,10 +181,10 @@ class ColorThemeExtension extends ThemeExtension<ColorThemeExtension> {
   );
 
   static final dark = ColorThemeExtension(
-    border: Color(0xFF234157),
+    border: apollo11Border,
     border2: Color(0xFFE5E5E5),
     border3: Colors.white24,
-    highlight: Color(0xFF102B40),
+    highlight: apollo11Surface,
     drag_indicator: Colors.grey,
     shadow: Colors.grey,
     errorBannerBg: Color(0xFF470F2D),
@@ -246,28 +246,31 @@ class ColorThemeExtension extends ThemeExtension<ColorThemeExtension> {
 }
 
 // Visual branding only; appName below remains the native RustDesk identity.
-const String apollo11VisualName = 'Apollo11 Remoto';
+const String apollo11VisualName = 'Suporte Apollo11';
 const apollo11SourceUrl = String.fromEnvironment('APOLLO11_SOURCE_URL');
-const Color apollo11Background = Color(0xFF020B15);
-const Color apollo11Panel = Color(0xFF061522);
-const Color apollo11Accent = Color(0xFFFFBF16);
+const Color apollo11Background = Color(0xFF0D1928);
+const Color apollo11Panel = Color(0xFF101E2E);
+const Color apollo11Surface = Color(0xFF132234);
+const Color apollo11Border = Color(0xFF293D52);
+const Color apollo11SecondaryText = Color(0xFFA9B9CB);
+const Color apollo11Accent = Color(0xFF0BB15E);
 const Color apollo11ButtonForeground = apollo11Background;
 
 class MyTheme {
   MyTheme._();
 
   static const Color grayBg = Color(0xFFEFEFF2);
-  static const Color accent = Color(0xFF0071FF);
-  static const Color accent50 = Color(0x770071FF);
-  static const Color accent80 = Color(0xAA0071FF);
+  static const Color accent = apollo11Accent;
+  static const Color accent50 = Color(0x770BB15E);
+  static const Color accent80 = Color(0xAA0BB15E);
   static const Color canvasColor = apollo11Background;
   static const Color border = Color(0xFFCCCCCC);
-  static const Color idColor = Color(0xFF00B6F0);
+  static const Color idColor = apollo11Accent;
   static const Color darkGray = Color.fromARGB(255, 148, 148, 148);
   static const Color cmIdColor = Color(0xFF21790B);
   static const Color dark = Colors.black87;
   static const Color button = apollo11Accent;
-  static const Color hoverBorder = Color(0xFF999999);
+  static const Color hoverBorder = apollo11Accent;
 
   // ListTile
   static const ListTileThemeData listTileTheme = ListTileThemeData(
@@ -438,6 +441,7 @@ class MyTheme {
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         backgroundColor: MyTheme.accent,
+        foregroundColor: apollo11ButtonForeground,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8.0),
         ),
@@ -460,7 +464,11 @@ class MyTheme {
         style:
             MenuStyle(backgroundColor: MaterialStatePropertyAll(Colors.white))),
     colorScheme: ColorScheme.light(
-        primary: Colors.blue, secondary: accent, background: grayBg),
+        primary: apollo11Accent,
+        onPrimary: apollo11ButtonForeground,
+        secondary: apollo11Accent,
+        onSecondary: apollo11ButtonForeground,
+        background: grayBg),
     popupMenuTheme: PopupMenuThemeData(
         color: Colors.white,
         shape: RoundedRectangleBorder(
@@ -479,9 +487,9 @@ class MyTheme {
   static ThemeData darkTheme = ThemeData(
     useMaterial3: false,
     brightness: Brightness.dark,
-    hoverColor: Color(0xFF102B40),
+    hoverColor: apollo11Surface,
     scaffoldBackgroundColor: apollo11Background,
-    dialogBackgroundColor: apollo11Background,
+    dialogBackgroundColor: apollo11Panel,
     appBarTheme: AppBarTheme(
       shadowColor: Colors.transparent,
     ),
@@ -491,36 +499,42 @@ class MyTheme {
         borderRadius: BorderRadius.circular(18.0),
         side: BorderSide(
           width: 1,
-          color: apollo11Panel,
+          color: apollo11Border,
         ),
       ),
     ),
     scrollbarTheme: scrollbarThemeDark,
     inputDecorationTheme: (isDesktop || isWebDesktop)
         ? InputDecorationTheme(
-            fillColor: apollo11Panel,
+            fillColor: apollo11Surface,
             filled: true,
             isDense: true,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
             ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide(color: apollo11Border),
+            ),
           )
         : null,
     textTheme: const TextTheme(
-      titleLarge: TextStyle(fontSize: 19),
-      titleSmall: TextStyle(fontSize: 14),
-      bodySmall: TextStyle(fontSize: 12, height: 1.25),
-      bodyMedium: TextStyle(fontSize: 14, height: 1.25),
+      titleLarge: TextStyle(fontSize: 19, color: Colors.white),
+      titleSmall: TextStyle(fontSize: 14, color: Colors.white),
+      bodySmall: TextStyle(
+          fontSize: 12, height: 1.25, color: apollo11SecondaryText),
+      bodyMedium: TextStyle(fontSize: 14, height: 1.25, color: Colors.white),
       labelLarge: TextStyle(
         fontSize: 16.0,
         fontWeight: FontWeight.bold,
         color: apollo11Accent,
       ),
     ),
-    cardColor: apollo11Panel,
+    cardColor: apollo11Surface,
+    hintColor: apollo11SecondaryText,
     visualDensity: VisualDensity.adaptivePlatformDensity,
     tabBarTheme: const TabBarTheme(
-      labelColor: Colors.white70,
+      labelColor: apollo11SecondaryText,
     ),
     tooltipTheme: tooltipTheme(),
     splashColor: (isDesktop || isWebDesktop) ? Colors.transparent : null,
@@ -531,7 +545,7 @@ class MyTheme {
             style: TextButton.styleFrom(
               splashFactory: NoSplash.splashFactory,
               disabledForegroundColor: Colors.white70,
-              foregroundColor: Colors.white70,
+              foregroundColor: apollo11Accent,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(18.0),
               ),
@@ -552,9 +566,9 @@ class MyTheme {
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
         backgroundColor: apollo11Panel,
-        side: BorderSide(color: Colors.white12, width: 0.5),
+        side: BorderSide(color: apollo11Border, width: 0.5),
         disabledForegroundColor: Colors.white70,
-        foregroundColor: Colors.white70,
+        foregroundColor: apollo11SecondaryText,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8.0),
         ),
@@ -566,17 +580,19 @@ class MyTheme {
     listTileTheme: listTileTheme,
     menuBarTheme: MenuBarThemeData(
         style: MenuStyle(
-            backgroundColor: MaterialStatePropertyAll(apollo11Background))),
+            backgroundColor: MaterialStatePropertyAll(apollo11Panel))),
     colorScheme: ColorScheme.dark(
       primary: apollo11Accent,
       onPrimary: apollo11ButtonForeground,
       secondary: apollo11Accent,
       onSecondary: apollo11ButtonForeground,
       background: apollo11Panel,
+      surface: apollo11Surface,
     ),
     popupMenuTheme: PopupMenuThemeData(
+        color: apollo11Panel,
         shape: RoundedRectangleBorder(
-      side: BorderSide(color: Colors.white24),
+      side: BorderSide(color: apollo11Border),
       borderRadius: BorderRadius.all(Radius.circular(8.0)),
     )),
   ).copyWith(
@@ -1160,7 +1176,7 @@ Widget createDialogContent(String text) {
     spans.add(TextSpan(
       text: match.group(0) ?? '',
       style: const TextStyle(
-        color: Colors.blue,
+        color: MyTheme.accent,
         decoration: TextDecoration.underline,
       ),
       recognizer: TapGestureRecognizer()
@@ -3858,6 +3874,8 @@ class _LogoState extends State<_Logo> {
             },
           );
           return Container(
+            color: apollo11Panel,
+            padding: const EdgeInsets.all(6),
             constraints: BoxConstraints(maxWidth: 300, maxHeight: 60),
             child: image,
           ).marginOnly(left: 12, right: 12, top: 12);

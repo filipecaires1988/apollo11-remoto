@@ -1,7 +1,7 @@
 name: Central Apollo11 | Cadastro e API
 'on':
   push:
-    branches: [apollo11-central]
+    branches: [apollo11-central, apollo11-identidade-verde]
     paths:
       - 'central-server/**'
       - 'flutter/lib/apollo11/**'

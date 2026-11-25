@@ -80,7 +80,7 @@ is_complete_patch_state() {
   has_exact_count "$THEME_MATCHES" 'dialogTheme: DialogThemeData(' flutter/lib/common.dart &&
     has_exact_count "$THEME_MATCHES" 'tabBarTheme: const TabBarThemeData(' flutter/lib/common.dart &&
     has_exact_count "$SINGLE_MATCH" 'backgroundColor: Colors.white,' flutter/lib/common.dart &&
-    has_exact_count "$SINGLE_MATCH" 'backgroundColor: Color(0xFF18191E),' flutter/lib/common.dart &&
+    has_exact_count "$SINGLE_MATCH" 'backgroundColor: Color(0xFF101E2E),' flutter/lib/common.dart &&
     has_exact_count "$SINGLE_MATCH" 'extended_text: 15.0.2' flutter/pubspec.yaml &&
     has_exact_count "$SINGLE_MATCH" 'google_fonts: ^8.1.0' flutter/pubspec.yaml &&
     has_exact_count "$NO_MATCHES" 'dialogTheme: DialogTheme(' flutter/lib/common.dart &&
@@ -91,7 +91,7 @@ is_complete_patch_state() {
       'static ThemeData darkTheme = ThemeData(' 'backgroundColor: Colors.white,' \
       flutter/lib/common.dart &&
     has_dialog_background_in_theme_range 'static ThemeData darkTheme = ThemeData(' \
-      'scrollbarTheme: scrollbarThemeDark,' 'backgroundColor: Color(0xFF18191E),' \
+      'scrollbarTheme: scrollbarThemeDark,' 'backgroundColor: Color(0xFF101E2E),' \
       flutter/lib/common.dart
 }
 
@@ -103,7 +103,7 @@ is_unpatched_state() {
     has_exact_count "$NO_MATCHES" 'dialogTheme: DialogThemeData(' flutter/lib/common.dart &&
     has_exact_count "$NO_MATCHES" 'tabBarTheme: const TabBarThemeData(' flutter/lib/common.dart &&
     has_exact_count "$NO_MATCHES" 'backgroundColor: Colors.white,' flutter/lib/common.dart &&
-    has_exact_count "$NO_MATCHES" 'backgroundColor: Color(0xFF18191E),' flutter/lib/common.dart &&
+    has_exact_count "$NO_MATCHES" 'backgroundColor: Color(0xFF101E2E),' flutter/lib/common.dart &&
     has_exact_count "$NO_MATCHES" 'extended_text: 15.0.2' flutter/pubspec.yaml &&
     has_exact_count "$NO_MATCHES" 'google_fonts: ^8.1.0' flutter/pubspec.yaml
 }
@@ -129,7 +129,7 @@ sed -i 's/tabBarTheme: const TabBarTheme(/tabBarTheme: const TabBarThemeData(/g'
 sed -i '/static ThemeData lightTheme = ThemeData(/,/static ThemeData darkTheme = ThemeData(/s/dialogTheme: DialogThemeData(/dialogTheme: DialogThemeData(\
       backgroundColor: Colors.white,/' flutter/lib/common.dart
 sed -i '/static ThemeData darkTheme = ThemeData(/,/scrollbarTheme: scrollbarThemeDark,/s/dialogTheme: DialogThemeData(/dialogTheme: DialogThemeData(\
-      backgroundColor: Color(0xFF18191E),/' flutter/lib/common.dart
+      backgroundColor: Color(0xFF101E2E),/' flutter/lib/common.dart
 # Dependency bumps required by the newer Dart/Flutter:
 sed -i 's/extended_text: 14.0.0/extended_text: 15.0.2/' flutter/pubspec.yaml
 sed -i 's/google_fonts: \^6.2.1/google_fonts: ^8.1.0/' flutter/pubspec.yaml
