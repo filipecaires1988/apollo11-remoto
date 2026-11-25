@@ -11,6 +11,9 @@ Esta edição atualiza a identidade visual com a nuvem branca e o foguete verde 
 - `flutter/lib/desktop/pages/desktop_home_page.dart` e imagens da marca: logo da família Apollo11 no painel principal.
 - `flutter/lib/apollo11/central_page.dart`: paleta da Central de Clientes, bordas dos campos e tamanho da logo no cabeçalho. Os callbacks e os fluxos de cadastro, busca, favoritos, vínculo e conexão permanecem iguais.
 - `BRAND.json`: nome, edição, origem da imagem e cores da identidade atualizados.
+- `Cargo.toml`, `libs/portable/Cargo.toml` e `flutter/windows/runner/Runner.rc`: nome e descrição visíveis do produto passam a Apollo11 Remoto. Os copyrights, nomes dos arquivos e identificadores internos são preservados.
+- `flutter/windows/runner/main.cpp`: títulos nativos usam Apollo11 Remoto; a busca da janela existente reconhece tanto o título atual quanto o nome interno anterior.
+- `flutter/macos/Runner/Info.plist` e `flutter/macos/Runner/Configs/AppInfo.xcconfig`: nome exibido no Mac separado do nome interno de compilação para manter o caminho RustDesk.app e os módulos existentes.
 
 São alterações de apresentação. Nenhum código de transporte, autenticação, credenciais, serviço ou armazenamento foi alterado para a troca de identidade. A compilação e a aparência nos sistemas de destino ainda precisam ser verificadas nesta edição.
 

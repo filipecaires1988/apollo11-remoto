@@ -29,6 +29,7 @@ import 'package:window_manager/window_manager.dart';
 import 'package:window_size/window_size.dart' as window_size;
 
 import '../consts.dart';
+import 'apollo11/branding.dart';
 import 'common/widgets/overlay.dart';
 import 'mobile/pages/file_manager_page.dart';
 import 'mobile/pages/remote_page.dart';
@@ -246,7 +247,7 @@ class ColorThemeExtension extends ThemeExtension<ColorThemeExtension> {
 }
 
 // Visual branding only; appName below remains the native RustDesk identity.
-const String apollo11VisualName = 'Suporte Apollo11';
+const String apollo11VisualName = apollo11DisplayName;
 const apollo11SourceUrl = String.fromEnvironment('APOLLO11_SOURCE_URL');
 const Color apollo11Background = Color(0xFF0D1928);
 const Color apollo11Panel = Color(0xFF101E2E);
@@ -1633,7 +1634,7 @@ String translate(String name) {
   if (name.startsWith('Failed to') && name.contains(': ')) {
     return name.split(': ').map((x) => translate(x)).join(': ');
   }
-  return platformFFI.translate(name, localeName);
+  return apollo11DisplayText(platformFFI.translate(name, localeName));
 }
 
 // This function must be kept the same as the one in rust and sciter code.
@@ -3087,7 +3088,7 @@ int versionCmp(String v1, String v2) {
 }
 
 String getWindowName({WindowType? overrideType}) {
-  final name = bind.mainGetAppNameSync();
+  const name = apollo11VisualName;
   switch (overrideType ?? kWindowType) {
     case WindowType.Main:
       return name;

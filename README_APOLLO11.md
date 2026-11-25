@@ -4,9 +4,13 @@ Esta preparação atende ao uso da Apollo11 no suporte aos seus próprios client
 
 ## Identidade visual: edição apollo11.4
 
-O Suporte Apollo11 passa a usar a mesma identidade da Central de TI e da Central de Backups: nuvem branca, foguete verde, nome Apollo11 em branco e a identificação ACESSO REMOTO. O fundo usa azul-marinho `#0D1928`, os painéis `#101E2E`, os campos `#132234` e os botões e destaques `#0BB15E`.
+O Apollo11 Remoto passa a usar a mesma identidade da Central de TI e da Central de Backups: nuvem branca, foguete verde, nome Apollo11 em branco e a identificação ACESSO REMOTO. O fundo usa azul-marinho `#0D1928`, os painéis `#101E2E`, os campos `#132234` e os botões e destaques `#0BB15E`.
 
 A atualização aplica a marca à janela principal, às abas, aos botões e à Central de Clientes. A opção de tema claro continua disponível com os destaques verdes. Não altera o cadastro, os catálogos local e online, as credenciais, a autenticação remota nem os servidores configurados. A compilação nativa desta edição ainda precisa ser concluída e conferida; os resultados históricos abaixo pertencem às respectivas edições anteriores.
+
+## Nome visível do programa
+
+Os títulos das janelas e as descrições de produto do Windows usam Apollo11 Remoto. No Mac, o nome exibido pelo sistema usa Apollo11 Remoto; o nome de compilação e o caminho do pacote permanecem RustDesk.app. Os nomes de serviço, processo, arquivos de configuração, protocolo e identificadores internos continuam compatíveis com a instalação existente. Os créditos do projeto original e a licença são preservados nos fontes e na distribuição.
 
 ## Central Apollo11: edição apollo11.3-central
 

@@ -1,5 +1,5 @@
 {
-  "display_name": "Suporte Apollo11",
+  "display_name": "Apollo11 Remoto",
   "edition": "1.5.3-apollo11.4",
   "upstream": "https://github.com/rustdesk/rustdesk",
   "upstream_tag": "1.5.3",
@@ -19,7 +19,7 @@
   "internal_identity": "RustDesk",
   "network_defaults": "unchanged",
   "windows_shortcut_name": "Suporte Apollo11",
-  "tray_display_name": "Apollo11",
+  "tray_display_name": "Apollo11 Remoto",
   "icon_source": "res/icon.png",
   "icon_sha256": "89fd5f2c76141521048e8bfd9eee62973eb3a42141e504c8228ba11a364ce4db"
 }
