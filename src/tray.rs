@@ -43,7 +43,7 @@ fn make_tray() -> hbb_common::ResultType<()> {
     let icon;
     #[cfg(target_os = "macos")]
     {
-        icon = include_bytes!("../res/mac-tray-dark-x2.png"); // use as template, so color is not important
+        icon = include_bytes!("../flutter/assets/icon.png");
     }
     #[cfg(not(target_os = "macos"))]
     {
