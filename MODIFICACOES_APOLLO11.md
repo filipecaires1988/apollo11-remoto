@@ -1,17 +1,30 @@
 # Modificações desta edição
 
-Edição `1.5.3-apollo11.3-central`, preparada em 17/11/2026, com base em RustDesk 1.5.3. A identidade visual pertence à Apollo11. O código RustDesk e seus avisos originais continuam sob AGPL-3.0.
+Edição `1.5.3-apollo11.4`, preparada em 25/11/2026, com base em RustDesk 1.5.3. A identidade visual pertence à Apollo11. O código RustDesk e seus avisos originais continuam sob AGPL-3.0.
 
-A edição atual acrescenta a [Central Apollo11](CENTRAL_APOLLO11.md), com módulos próprios de interface, armazenamento, API e contato periódico do serviço. O guia registra a superfície de alteração e os limites. As verificações das seções `.1` e `.2` abaixo permanecem históricas.
+Esta edição atualiza a identidade visual com a nuvem branca e o foguete verde da Apollo11. A [Central Apollo11](CENTRAL_APOLLO11.md), acrescentada na edição `.3-central`, mantém o cadastro, o armazenamento local, a API e o contato periódico do serviço. As verificações das edições anteriores abaixo permanecem históricas.
+
+## Escopo visual da edição apollo11.4
+
+- `flutter/lib/common.dart`: cores compartilhadas dos temas, painéis, campos, bordas e destaques verdes; o texto dos botões preenchidos usa azul-marinho para manter contraste.
+- `flutter/lib/desktop/widgets/tabbar_widget.dart`: cores das abas da janela no tema Apollo11.
+- `flutter/lib/desktop/pages/desktop_home_page.dart` e imagens da marca: logo da família Apollo11 no painel principal.
+- `flutter/lib/apollo11/central_page.dart`: paleta da Central de Clientes, bordas dos campos e tamanho da logo no cabeçalho. Os callbacks e os fluxos de cadastro, busca, favoritos, vínculo e conexão permanecem iguais.
+- `BRAND.json`: nome, edição, origem da imagem e cores da identidade atualizados.
+- `Cargo.toml`, `libs/portable/Cargo.toml` e `flutter/windows/runner/Runner.rc`: nome e descrição visíveis do produto passam a Apollo11 Remoto. Os copyrights, nomes dos arquivos e identificadores internos são preservados.
+- `flutter/windows/runner/main.cpp`: títulos nativos usam Apollo11 Remoto; a busca da janela existente reconhece tanto o título atual quanto o nome interno anterior.
+- `flutter/macos/Runner/Info.plist` e `flutter/macos/Runner/Configs/AppInfo.xcconfig`: nome exibido no Mac separado do nome interno de compilação para manter o caminho RustDesk.app e os módulos existentes.
+
+São alterações de apresentação. Nenhum código de transporte, autenticação, credenciais, serviço ou armazenamento foi alterado para a troca de identidade. A compilação e a aparência nos sistemas de destino ainda precisam ser verificadas nesta edição.
 
 ## Arquivos existentes com comportamento alterado
 
 | Arquivo na raiz deste repositório | Caminho alterado | Motivo |
 | --- | --- | --- |
-| `flutter/lib/common.dart` | Paleta, constantes de marca e URL de fontes | Aplicar azul escuro e amarelo, preservar leitura no tema claro e fornecer identidade visual compartilhada. |
-| `flutter/lib/desktop/pages/desktop_home_page.dart` | Cabeçalho do painel lateral | Mostrar a logo original e Apollo11 Remoto. |
+| `flutter/lib/common.dart` | Paleta, constantes de marca e URL de fontes | Aplicar azul-marinho e verde, preservar leitura no tema claro e fornecer identidade visual compartilhada. |
+| `flutter/lib/desktop/pages/desktop_home_page.dart` | Cabeçalho do painel lateral | Mostrar a logo Apollo11 com a identificação ACESSO REMOTO. |
 | `flutter/lib/desktop/pages/desktop_setting_page.dart` | Tela Sobre | Identificar a edição modificada e oferecer o acesso aos fontes correspondentes, mantendo os créditos e links originais. |
-| `flutter/lib/desktop/widgets/button.dart` | Cores visíveis de botões preenchidos e pressionados | Garantir contraste com o amarelo. Os callbacks não foram alterados. |
+| `flutter/lib/desktop/widgets/button.dart` | Cores visíveis de botões preenchidos e pressionados | Garantir contraste do texto com os botões da marca. Os callbacks não foram alterados. |
 | `flutter/lib/desktop/widgets/tabbar_widget.dart` | Nome mostrado na aba e cores no tema escuro | Exibir Apollo11 Remoto e manter as cores da marca. |
 | `flutter/windows/runner/Runner.rc` | FileDescription e ProductName | Identificar visualmente a edição Apollo11 nas propriedades do Windows. Os nomes internos e os avisos de autoria permanecem. |
 | `src/tray.rs` | Nome visível no aviso da bandeja, com ou sem sessões | Exibir Apollo11 mantendo as traduções, a contagem de sessões e a identidade interna. |

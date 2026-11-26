@@ -5,6 +5,7 @@ name: Apollo11 Remoto | Windows e Mac
   push:
     branches:
     - apollo11-central
+    - apollo11-identidade-verde
   workflow_dispatch:
     inputs:
       source_url:

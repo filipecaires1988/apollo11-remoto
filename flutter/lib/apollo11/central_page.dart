@@ -11,10 +11,12 @@ import 'central_data.dart';
 import 'central_runtime.dart';
 import 'central_store.dart';
 
-const _navy = Color(0xFF020B15);
-const _panel = Color(0xFF0B1B2B);
-const _yellow = Color(0xFFFFBF16);
-const _muted = Color(0xFF9BAFC1);
+const _navy = Color(0xFF0D1928);
+const _panel = Color(0xFF101E2E);
+const _surface = Color(0xFF132234);
+const _border = Color(0xFF293D52);
+const _accent = Color(0xFF0BB15E);
+const _muted = Color(0xFFA9B9CB);
 
 class CentralPage extends StatefulWidget {
   const CentralPage({super.key, required this.runtime, this.store});
@@ -146,12 +148,28 @@ class _CentralPageState extends State<CentralPage> {
   Widget build(BuildContext context) {
     final theme = ThemeData.dark().copyWith(
       scaffoldBackgroundColor: _navy,
+      cardColor: _panel,
+      dividerColor: _border,
       colorScheme: const ColorScheme.dark(
-          primary: _yellow, secondary: _yellow, surface: _panel),
+        primary: _accent,
+        onPrimary: _navy,
+        secondary: _accent,
+        onSecondary: _navy,
+        surface: _panel,
+        onSurface: Colors.white,
+      ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: _panel,
+        fillColor: _surface,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(9)),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(9),
+          borderSide: const BorderSide(color: _border),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(9),
+          borderSide: const BorderSide(color: _accent),
+        ),
         isDense: true,
       ),
     );
@@ -185,7 +203,7 @@ class _CentralPageState extends State<CentralPage> {
                   IconButton(
                     tooltip: 'Mostrar apenas favoritos',
                     isSelected: _favoritesOnly,
-                    selectedIcon: const Icon(Icons.star, color: _yellow),
+                    selectedIcon: const Icon(Icons.star, color: _accent),
                     icon: const Icon(Icons.star_border),
                     onPressed: () =>
                         setState(() => _favoritesOnly = !_favoritesOnly),
@@ -226,10 +244,12 @@ class _CentralPageState extends State<CentralPage> {
     );
   }
 
-  Widget _header() => Padding(
-        padding: const EdgeInsets.fromLTRB(18, 14, 8, 8),
+  Widget _header() => Container(
+        color: _panel,
+        padding: const EdgeInsets.fromLTRB(18, 14, 8, 12),
         child: Row(children: [
-          Image.asset('assets/apollo11-logo.png', width: 120, height: 38),
+          Image.asset('assets/apollo11-logo.png',
+              width: 172, height: 54, fit: BoxFit.contain),
           const SizedBox(width: 14),
           const Expanded(
               child: Column(
@@ -325,7 +345,7 @@ class _CentralPageState extends State<CentralPage> {
                 contentPadding: const EdgeInsets.only(left: 8, right: 4),
                 leading: Icon(
                     expanded ? Icons.expand_more : Icons.chevron_right,
-                    color: _yellow),
+                    color: _accent),
                 title: Text(group.name,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(fontWeight: FontWeight.w700)),
@@ -426,7 +446,7 @@ class _CentralPageState extends State<CentralPage> {
             tooltip: _online ? 'Favorito nesta sessão' : 'Favorito',
             onPressed: _writable ? () => _toggleFavorite(device) : null,
             icon: Icon(_isFavorite(device) ? Icons.star : Icons.star_border,
-                color: _isFavorite(device) ? _yellow : _muted, size: 19)),
+                color: _isFavorite(device) ? _accent : _muted, size: 19)),
         Icon(
             device.platform == 'macOS'
                 ? Icons.laptop_mac

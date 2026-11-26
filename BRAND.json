@@ -1,19 +1,28 @@
 {
   "display_name": "Apollo11 Remoto",
-  "edition": "1.5.3-apollo11.3-central",
+  "edition": "1.5.3-apollo11.7",
   "upstream": "https://github.com/rustdesk/rustdesk",
   "upstream_tag": "1.5.3",
   "upstream_commit": "95cca3f661f635b3cc85c04935fe8d96d8f432ef",
   "submodule_hbb_common_commit": "fae47e024dd83cef6aaecde0aa7d11731df11649",
-  "logo_source": "https://apollo11.com.br/wp-content/plugins/apollo11-sites-apps/assets/logo-apollo11.png",
-  "logo_sha256": "7f527a881d587683a955b55ef0d169f96d9218ada26b371b0472d619473e9925",
+  "logo_source": "flutter/assets/apollo11-logo.png",
+  "logo_sha256": "92a25a5d77645ffef4be5c2118e1e2abd68818bed6f20c559f9435ecb29d5071",
   "colors": {
-    "background": "#020b15",
-    "panel": "#061522",
-    "accent": "#ffbf16"
+    "background": "#0D1928",
+    "panel": "#101E2E",
+    "surface": "#132234",
+    "border": "#293D52",
+    "accent": "#0BB15E",
+    "text": "#FFFFFF",
+    "secondary_text": "#A9B9CB"
   },
   "internal_identity": "RustDesk",
   "network_defaults": "unchanged",
   "windows_shortcut_name": "Suporte Apollo11",
-  "tray_display_name": "Apollo11"
+  "tray_display_name": "Apollo11 Remoto",
+  "icon_source": "res/icon.png",
+  "icon_sha256": "21ddc80b4e2ce81d5ed30a7d27985f8a0f72cf42da3d3643cb9faedece2df394",
+  "logo_variant": "Escudo aprovado",
+  "theme_policy": "fixed-dark",
+  "macos_menu_icon": "full-color"
 }

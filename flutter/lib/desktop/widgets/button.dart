@@ -63,7 +63,9 @@ class _ButtonState extends State<Button> {
                         : hover.value
                             ? MyTheme.hoverBorder
                             : (widget.isOutline
-                                ? widget.borderColor ?? MyTheme.border
+                                ? widget.borderColor ??
+                                    MyTheme.color(context).border ??
+                                    MyTheme.border
                                 : MyTheme.button),
                   ),
                   borderRadius: BorderRadius.circular(widget.radius ?? 5),
@@ -140,7 +142,9 @@ class _FixedWidthButtonState extends State<FixedWidthButton> {
                     : hover.value
                         ? MyTheme.hoverBorder
                         : (widget.isOutline
-                            ? widget.borderColor ?? MyTheme.border
+                            ? widget.borderColor ??
+                                MyTheme.color(context).border ??
+                                MyTheme.border
                             : MyTheme.button),
               ),
               borderRadius: BorderRadius.circular(widget.radius ?? 5),

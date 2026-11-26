@@ -33,7 +33,7 @@ class DesktopHomePage extends StatefulWidget {
   State<DesktopHomePage> createState() => _DesktopHomePageState();
 }
 
-const borderColor = Color(0xFF2F65BA);
+const borderColor = apollo11Border;
 
 class _DesktopHomePageState extends State<DesktopHomePage>
     with AutomaticKeepAliveClientMixin, WidgetsBindingObserver {
@@ -92,17 +92,11 @@ class _DesktopHomePageState extends State<DesktopHomePage>
           color: apollo11Panel,
           width: double.infinity,
           padding: const EdgeInsets.fromLTRB(12, 16, 12, 12),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Image.asset('assets/apollo11-logo.png',
-                  width: 176, height: 52, fit: BoxFit.contain),
-              const SizedBox(height: 6),
-              const Text(apollo11VisualName,
-                  style: TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.w600)),
-            ],
-          ),
+          child: Image.asset('assets/apollo11-logo.png',
+              width: 176,
+              height: 58,
+              fit: BoxFit.contain,
+              semanticLabel: 'Apollo11 Acesso Remoto'),
         ),
       ),
       if (isWindows || isMacOS)

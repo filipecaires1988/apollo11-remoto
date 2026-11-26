@@ -43,7 +43,7 @@ fn make_tray() -> hbb_common::ResultType<()> {
     let icon;
     #[cfg(target_os = "macos")]
     {
-        icon = include_bytes!("../res/mac-tray-dark-x2.png"); // use as template, so color is not important
+        icon = include_bytes!("../flutter/assets/icon.png");
     }
     #[cfg(not(target_os = "macos"))]
     {
@@ -84,13 +84,13 @@ fn make_tray() -> hbb_common::ResultType<()> {
         if count == 0 {
             format!(
                 "{} {}",
-                "Apollo11",
+                "Apollo11 Remoto",
                 translate("Service is running".to_owned()),
             )
         } else {
             format!(
                 "{} - {}\n{}",
-                "Apollo11",
+                "Apollo11 Remoto",
                 translate("Ready".to_owned()),
                 translate("{".to_string() + &format!("{count}") + "} sessions"),
             )
@@ -160,7 +160,8 @@ fn make_tray() -> hbb_common::ResultType<()> {
                 .with_icon(icon.clone());
             #[cfg(target_os = "macos")]
             {
-                builder = builder.with_icon_as_template(true);
+                // Preserve the green Apollo11 rocket in the macOS menu bar.
+                builder = builder.with_icon_as_template(false);
             }
             #[cfg(target_os = "windows")]
             {
