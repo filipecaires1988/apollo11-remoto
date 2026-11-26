@@ -160,7 +160,8 @@ fn make_tray() -> hbb_common::ResultType<()> {
                 .with_icon(icon.clone());
             #[cfg(target_os = "macos")]
             {
-                builder = builder.with_icon_as_template(true);
+                // Preserve the green Apollo11 rocket in the macOS menu bar.
+                builder = builder.with_icon_as_template(false);
             }
             #[cfg(target_os = "windows")]
             {
