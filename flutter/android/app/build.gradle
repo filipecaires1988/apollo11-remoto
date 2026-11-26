@@ -84,6 +84,7 @@ protobuf {
 android {
     namespace "com.carriez.flutter_hbb"
     compileSdkVersion 36
+    ndkVersion "28.2.13676358"
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
 
@@ -98,8 +99,8 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId "com.carriez.flutter_hbb"
+        // Keep the JNI namespace above; the installed Apollo11 app has its own identity.
+        applicationId "com.apollo11.remoto"
         minSdkVersion 22
         targetSdkVersion 36
         versionCode flutterVersionCode.toInteger()
@@ -117,9 +118,8 @@ android {
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig signingConfigs.release
+            // CI exports an unsigned APK. The private release key stays outside the repository.
+            signingConfig keystorePropertiesFile.exists() ? signingConfigs.release : null
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules'
         }
     }

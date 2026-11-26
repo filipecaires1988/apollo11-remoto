@@ -1,6 +1,6 @@
 {
   "display_name": "Apollo11 Remoto",
-  "edition": "1.5.3-apollo11.7",
+  "edition": "1.5.3-apollo11.8",
   "upstream": "https://github.com/rustdesk/rustdesk",
   "upstream_tag": "1.5.3",
   "upstream_commit": "95cca3f661f635b3cc85c04935fe8d96d8f432ef",
@@ -24,5 +24,7 @@
   "icon_sha256": "21ddc80b4e2ce81d5ed30a7d27985f8a0f72cf42da3d3643cb9faedece2df394",
   "logo_variant": "Escudo aprovado",
   "theme_policy": "fixed-dark",
-  "macos_menu_icon": "full-color"
+  "macos_menu_icon": "full-color",
+  "android_application_id": "com.apollo11.remoto",
+  "android_version_code": 15308
 }

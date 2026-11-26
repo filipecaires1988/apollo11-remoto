@@ -1,0 +1,8 @@
+<resources>
+    <string name="input_service_name">Entrada do Apollo11 Remoto</string>
+    <string name="app_opened">Apollo11 Remoto está aberto</string>
+    <string name="notification_channel_name">Serviço Apollo11 Remoto</string>
+    <string name="notification_channel_description">Notificações do serviço Apollo11 Remoto</string>
+    <string name="show_app">Mostrar Apollo11 Remoto</string>
+    <string name="accessibility_service_description">Permite que outros dispositivos controlem seu celular por toque virtual quando o compartilhamento de tela do Apollo11 Remoto estiver ativo</string>
+</resources>

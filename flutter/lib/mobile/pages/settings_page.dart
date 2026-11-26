@@ -39,6 +39,9 @@ class SettingsPage extends StatefulWidget implements PageShape {
 }
 
 const url = 'https://rustdesk.com/';
+const _apollo11AndroidVersion = '1.5.3-apollo11.8';
+const _apollo11RepositoryUrl =
+    'https://github.com/filipecaires1988/apollo11-remoto';
 
 enum KeepScreenOn {
   never,
@@ -904,13 +907,8 @@ class _SettingsState extends State<SettingsPage> with WidgetsBindingObserver {
                 showLanguageSettings(gFFI.dialogManager);
               }),
           SettingsTile(
-            title: Text(translate(
-                Theme.of(context).brightness == Brightness.light
-                    ? 'Light Theme'
-                    : 'Dark Theme')),
-            leading: Icon(Theme.of(context).brightness == Brightness.light
-                ? Icons.dark_mode
-                : Icons.light_mode),
+            title: Text(translate('Dark Theme')),
+            leading: Icon(Icons.dark_mode),
             onPressed: (context) {
               showThemeSettings(gFFI.dialogManager);
             },
@@ -1061,17 +1059,30 @@ class _SettingsState extends State<SettingsPage> with WidgetsBindingObserver {
           tiles: [
             SettingsTile(
                 onPressed: (context) async {
-                  await launchUrl(Uri.parse(url));
+                  await launchUrl(
+                      Uri.parse(isAndroid ? _apollo11RepositoryUrl : url));
                 },
-                title: Text(translate("Version: ") + version),
+                title: Text(isAndroid
+                    ? 'Versão: $_apollo11AndroidVersion'
+                    : translate("Version: ") + version),
                 value: Padding(
                   padding: EdgeInsets.symmetric(vertical: 8),
-                  child: Text('rustdesk.com',
+                  child: Text(isAndroid ? apollo11VisualName : 'rustdesk.com',
                       style: TextStyle(
                         decoration: TextDecoration.underline,
                       )),
                 ),
                 leading: Icon(Icons.info)),
+            if (isAndroid)
+              SettingsTile(
+                title: const Text('Código-fonte e licença'),
+                description: Text('Baseado no RustDesk $version · AGPL-3.0'),
+                onPressed: (context) => launchUrlString(
+                    apollo11SourceUrl.isNotEmpty
+                        ? apollo11SourceUrl
+                        : '$_apollo11RepositoryUrl/tree/apollo11-android'),
+                leading: const Icon(Icons.code),
+              ),
             SettingsTile(
                 title: Text(translate("Build Date")),
                 value: Padding(
@@ -1177,28 +1188,10 @@ void showLanguageSettings(OverlayDialogManager dialogManager) async {
 }
 
 void showThemeSettings(OverlayDialogManager dialogManager) async {
-  var themeMode = MyTheme.getThemeModePreference();
-
   dialogManager.show((setState, close, context) {
-    setTheme(v) {
-      if (themeMode != v) {
-        setState(() {
-          themeMode = v;
-        });
-        MyTheme.changeDarkMode(themeMode);
-        Future.delayed(Duration(milliseconds: 200), close);
-      }
-    }
-
-    final isOptFixed = isOptionFixed(kCommConfKeyTheme);
     return CustomAlertDialog(
       content: Column(children: [
-        getRadio(Text(translate('Light')), ThemeMode.light, themeMode,
-            isOptFixed ? null : setTheme),
-        getRadio(Text(translate('Dark')), ThemeMode.dark, themeMode,
-            isOptFixed ? null : setTheme),
-        getRadio(Text(translate('Follow System')), ThemeMode.system, themeMode,
-            isOptFixed ? null : setTheme)
+        getRadio(Text(translate('Dark')), ThemeMode.dark, ThemeMode.dark, null)
       ]),
     );
   }, backDismiss: true, clickMaskDismiss: true);
