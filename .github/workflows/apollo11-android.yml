@@ -42,7 +42,7 @@ jobs:
         with:
           submodules: recursive
           persist-credentials: false
-          fetch-depth: 2
+          fetch-depth: 0
       - name: Check unchanged native sources before reusing libraries
         id: reuse
         env:
@@ -347,6 +347,7 @@ jobs:
   smoke:
     name: Instalação e abertura no Android 15
     needs: package
+    if: ${{ always() && needs.package.result == 'success' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     env:
