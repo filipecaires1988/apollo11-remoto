@@ -19,7 +19,7 @@ void main() {
     platformFFI.setBindingForTesting(binding);
     desktopType = DesktopType.cm;
     addTearDown(() async {
-      await Get.reset();
+      Get.reset();
       desktopType = previousDesktopType;
       tester.binding.platformDispatcher.clearPlatformBrightnessTestValue();
       platformFFI.setBindingForTesting(_ThemeBinding());
