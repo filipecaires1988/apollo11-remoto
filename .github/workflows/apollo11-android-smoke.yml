@@ -1,0 +1,94 @@
+name: Apollo11 Remoto | Testar APK Android existente
+'on':
+  push:
+    branches: [apollo11-android-smoke]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+env:
+  APK_SOURCE_RUN: '45903630323'
+  APK_SOURCE_COMMIT: e842d88f788cecbadcb796b2f747d9ff1a1273bd
+  BUILD_TOOLS_VERSION: '36.0.0'
+jobs:
+  smoke:
+    name: Instalar e abrir o APK já compilado
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
+    steps:
+      - name: Verify pinned APK provenance
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from urllib.request import Request, urlopen
+          def api(path):
+              request = Request(f"https://api.github.com/repos/{os.environ['GITHUB_REPOSITORY']}/{path}", headers={
+                  'Authorization': f"Bearer {os.environ['GH_TOKEN']}",
+                  'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'})
+              with urlopen(request, timeout=30) as response:
+                  return json.load(response)
+          run_id = os.environ['APK_SOURCE_RUN']
+          run = api(f'actions/runs/{run_id}')
+          assert run['head_sha'] == os.environ['APK_SOURCE_COMMIT'], 'Unexpected APK source commit'
+          assert run['status'] == 'completed', 'APK build is not complete'
+          artifacts = api(f'actions/runs/{run_id}/artifacts?per_page=100')['artifacts']
+          assert any(a['name'] == 'Apollo11-Android-universal-unsigned' and not a['expired']
+                     for a in artifacts), 'Pinned APK artifact unavailable'
+          print('Pinned APK source and artifact verified.')
+          PY
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          ref: ${{ env.APK_SOURCE_COMMIT }}
+          persist-credentials: false
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          name: Apollo11-Android-universal-unsigned
+          run-id: ${{ env.APK_SOURCE_RUN }}
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/unsigned/
+      - name: Verify APK checksum and sign disposable emulator copy
+        run: |
+          (cd "$RUNNER_TEMP/unsigned" && sha256sum --check SHA256SUMS.txt)
+          sudo apt-get update -q
+          sudo apt-get install -y openjdk-17-jdk-headless
+          export PATH="$JAVA_HOME/bin:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH"
+          echo "$JAVA_HOME/bin" >> "$GITHUB_PATH"
+          echo "$ANDROID_HOME/cmdline-tools/latest/bin" >> "$GITHUB_PATH"
+          echo "$ANDROID_HOME/platform-tools" >> "$GITHUB_PATH"
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "build-tools;$BUILD_TOOLS_VERSION"
+          mkdir -p "$RUNNER_TEMP/smoke"
+          keytool -genkeypair -keystore "$RUNNER_TEMP/smoke/ci-smoke.p12" \
+            -storetype PKCS12 -storepass android -keypass android -alias ci-smoke \
+            -keyalg RSA -keysize 2048 -validity 2 -dname 'CN=Apollo11 CI Smoke Test' -noprompt
+          "$ANDROID_HOME/build-tools/$BUILD_TOOLS_VERSION/apksigner" sign \
+            --ks "$RUNNER_TEMP/smoke/ci-smoke.p12" --ks-key-alias ci-smoke \
+            --ks-pass pass:android --key-pass pass:android \
+            --out "$RUNNER_TEMP/smoke/smoke.apk" "$RUNNER_TEMP/unsigned/"*.apk
+          "$ANDROID_HOME/build-tools/$BUILD_TOOLS_VERSION/apksigner" verify "$RUNNER_TEMP/smoke/smoke.apk"
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d
+        with:
+          api-level: 35
+          target: default
+          arch: x86_64
+          profile: pixel_6
+          ram-size: 2048M
+          disable-animations: true
+          emulator-boot-timeout: 600
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
+          script: bash .github/scripts/apollo11-android-smoke.sh "$RUNNER_TEMP/smoke/smoke.apk" "$RUNNER_TEMP/smoke/evidence"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: Apollo11-Android-smoke-evidence
+          path: ${{ runner.temp }}/smoke/evidence/
+          if-no-files-found: warn
+          retention-days: 30
