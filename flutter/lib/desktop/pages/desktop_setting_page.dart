@@ -468,28 +468,12 @@ class _GeneralState extends State<_General> {
 
   Widget theme() {
     final current = MyTheme.getThemeModePreference().toShortString();
-    onChanged(String value) async {
-      await MyTheme.changeDarkMode(MyTheme.themeModeFromString(value));
-      setState(() {});
-    }
-
-    final isOptFixed = isOptionFixed(kCommConfKeyTheme);
     return _Card(title: 'Theme', children: [
-      _Radio<String>(context,
-          value: 'light',
-          groupValue: current,
-          label: 'Light',
-          onChanged: isOptFixed ? null : onChanged),
       _Radio<String>(context,
           value: 'dark',
           groupValue: current,
           label: 'Dark',
-          onChanged: isOptFixed ? null : onChanged),
-      _Radio<String>(context,
-          value: 'system',
-          groupValue: current,
-          label: 'Follow System',
-          onChanged: isOptFixed ? null : onChanged),
+          onChanged: null),
     ]);
   }
 

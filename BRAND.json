@@ -1,6 +1,6 @@
 {
   "display_name": "Apollo11 Remoto",
-  "edition": "1.5.3-apollo11.5",
+  "edition": "1.5.3-apollo11.6",
   "upstream": "https://github.com/rustdesk/rustdesk",
   "upstream_tag": "1.5.3",
   "upstream_commit": "95cca3f661f635b3cc85c04935fe8d96d8f432ef",
@@ -22,5 +22,6 @@
   "tray_display_name": "Apollo11 Remoto",
   "icon_source": "res/icon.png",
   "icon_sha256": "21ddc80b4e2ce81d5ed30a7d27985f8a0f72cf42da3d3643cb9faedece2df394",
-  "logo_variant": "Escudo aprovado"
+  "logo_variant": "Escudo aprovado",
+  "theme_policy": "fixed-dark"
 }

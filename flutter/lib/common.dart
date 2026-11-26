@@ -604,10 +604,12 @@ class MyTheme {
   );
 
   static ThemeMode getThemeModePreference() {
-    return themeModeFromString(bind.mainGetLocalOption(key: kCommConfKeyTheme));
+    // Keep Apollo11's appearance independent of saved and system themes.
+    return ThemeMode.dark;
   }
 
   static Future<void> changeDarkMode(ThemeMode mode) async {
+    mode = ThemeMode.dark;
     Get.changeThemeMode(mode);
     if (desktopType == DesktopType.main || isAndroid || isIOS || isWeb) {
       if (mode == ThemeMode.system) {
