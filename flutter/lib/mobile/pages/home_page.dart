@@ -150,7 +150,11 @@ class HomePageState extends State<HomePage> {
         ],
       );
     }
-    return const Text(apollo11VisualName);
+    return Image.asset('assets/apollo11-logo.png',
+        width: 176,
+        height: 44,
+        fit: BoxFit.contain,
+        semanticLabel: apollo11VisualName);
   }
 }
 

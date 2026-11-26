@@ -1,0 +1,322 @@
+# Android recipe: RustDesk 95cca3f661f635b3cc85c04935fe8d96d8f432ef.
+# Production signing is performed privately after downloading the unsigned APK.
+name: Apollo11 Remoto | Android
+'on':
+  push:
+    branches: [apollo11-android]
+  workflow_dispatch:
+    inputs:
+      source_url:
+        description: URL HTTPS pública do ZIP completo destes fontes
+        type: string
+        required: false
+permissions:
+  contents: read
+concurrency:
+  group: apollo11-android-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'push' }}
+env:
+  RUST_VERSION: '1.75'
+  FLUTTER_VERSION: '3.24.5'
+  CARGO_NDK_VERSION: '3.1.2'
+  NDK_VERSION: r28c
+  BUILD_TOOLS_VERSION: '36.0.0'
+  VCPKG_COMMIT_ID: 9e593bb18ea69cc5095e012465dcd675a822ed0d
+  VCPKG_CMAKE_VERSION: '4.3.0'
+  VCPKG_BINARY_SOURCES: clear;default,readwrite
+  VERSION: 1.5.3-apollo11.8
+  ANDROID_VERSION_CODE: '15308'
+  APOLLO11_SOURCE_URL: ${{ inputs.source_url || format('https://github.com/filipecaires1988/apollo11-remoto/archive/{0}.zip', github.sha) }}
+jobs:
+  source-package:
+    name: Fontes correspondentes ao APK
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          submodules: recursive
+          persist-credentials: false
+      - name: Verify public source URL and package complete source tree
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import os
+          from urllib.parse import urlsplit
+          from urllib.request import HTTPRedirectHandler, Request, build_opener
+          def validate(value):
+              parsed = urlsplit(value)
+              if (not value or len(value) > 4096 or value != value.strip()
+                      or parsed.scheme != 'https' or not parsed.hostname
+                      or parsed.username or parsed.password or parsed.fragment):
+                  raise ValueError('A URL dos fontes precisa ser pública e usar HTTPS.')
+              _ = parsed.port
+              return value
+          class HttpsRedirects(HTTPRedirectHandler):
+              def redirect_request(self, req, fp, code, msg, headers, newurl):
+                  validate(newurl)
+                  return super().redirect_request(req, fp, code, msg, headers, newurl)
+          request = Request(validate(os.environ['APOLLO11_SOURCE_URL']),
+                            headers={'Range': 'bytes=0-4095', 'User-Agent': 'Apollo11-Source-Check/1.0'})
+          with build_opener(HttpsRedirects()).open(request, timeout=30) as response:
+              validate(response.url)
+              if response.status not in (200, 206) or response.read(4) not in (
+                      b'PK\x03\x04', b'PK\x05\x06', b'PK\x07\x08'):
+                  raise ValueError('A URL dos fontes não abriu um arquivo ZIP público.')
+          PY
+          git rev-parse HEAD > BUILD_COMMIT.txt
+          git submodule status --recursive > SUBMODULE_COMMITS.txt
+          zip -qyr "$RUNNER_TEMP/Apollo11_Remoto-${VERSION}-android-fontes.zip" . \
+            -x '.git/*' '.git/' '*/.git/*' '*/.git/' '*/.git' '.git' \
+            'target/*' 'flutter/build/*' 'flutter/.dart_tool/*' '*.apollo11-build-defines.json'
+          cd "$RUNNER_TEMP"
+          sha256sum "Apollo11_Remoto-${VERSION}-android-fontes.zip" \
+            > "Apollo11_Remoto-${VERSION}-android-fontes.sha256"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: Apollo11-Android-fontes
+          path: ${{ runner.temp }}/Apollo11_Remoto-${{ env.VERSION }}-android-fontes.*
+          if-no-files-found: error
+          retention-days: 30
+  generate-bridge:
+    needs: source-package
+    uses: ./.github/workflows/bridge.yml
+  native:
+    name: Biblioteca Android ${{ matrix.abi }}
+    needs: generate-bridge
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - abi: arm64-v8a
+            target: aarch64-linux-android
+            ndk-target: aarch64-linux-android
+            build-script: ndk_arm64.sh
+          - abi: armeabi-v7a
+            target: armv7-linux-androideabi
+            ndk-target: arm-linux-androideabi
+            build-script: ndk_arm.sh
+          - abi: x86_64
+            target: x86_64-linux-android
+            ndk-target: x86_64-linux-android
+            build-script: ndk_x64.sh
+    steps:
+      - uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be
+        with:
+          tool-cache: false
+          android: false
+          dotnet: true
+          haskell: true
+          large-packages: false
+          docker-images: true
+          swap-storage: false
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          submodules: recursive
+          persist-credentials: false
+      - name: Install native prerequisites
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y clang cmake curl gcc-multilib g++-multilib \
+            libayatana-appindicator3-dev libasound2-dev libc6-dev libclang-dev \
+            libunwind-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
+            libgtk-3-dev libpulse-dev libva-dev libxcb-randr0-dev \
+            libxcb-shape0-dev libxcb-xfixes0-dev libxdo-dev libxfixes-dev \
+            llvm-dev nasm ninja-build pkg-config
+      - uses: nttld/setup-ndk@ed92fe6cadad69be94a966a7ee3271275e62f779
+        id: ndk
+        with:
+          ndk-version: ${{ env.NDK_VERSION }}
+          add-to-path: true
+      - name: Export NDK paths
+        run: |
+          echo "ANDROID_NDK_HOME=${{ steps.ndk.outputs.ndk-path }}" >> "$GITHUB_ENV"
+          echo "ANDROID_NDK_ROOT=${{ steps.ndk.outputs.ndk-path }}" >> "$GITHUB_ENV"
+      - uses: lukka/run-vcpkg@b1a0dd252f06b9e25b3c022a9a03bd7a427fb6a2
+        with:
+          vcpkgDirectory: /opt/artifacts/vcpkg
+          vcpkgGitCommitId: ${{ env.VCPKG_COMMIT_ID }}
+          doNotCache: false
+      - name: Build codec dependencies
+        run: ./flutter/build_android_deps.sh '${{ matrix.abi }}'
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          name: bridge-artifact
+          path: ./
+      - uses: dtolnay/rust-toolchain@e97e2d8cc328f1b50210efc529dca0028893a2d9
+        with:
+          toolchain: ${{ env.RUST_VERSION }}
+          targets: ${{ matrix.target }}
+      - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32
+        with:
+          prefix-key: apollo11-android
+          key: ${{ matrix.target }}
+      - name: Build native library
+        run: |
+          cargo install cargo-ndk --version "$CARGO_NDK_VERSION" --locked
+          ./flutter/${{ matrix.build-script }}
+          destination="native/${{ matrix.abi }}"
+          mkdir -p "$destination"
+          cp 'target/${{ matrix.target }}/release/liblibrustdesk.so' "$destination/librustdesk.so"
+          cp "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/${{ matrix.ndk-target }}/libc++_shared.so" "$destination/"
+          "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-strip" "$destination/"*.so
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: Apollo11-Android-native-${{ matrix.abi }}
+          path: native/
+          if-no-files-found: error
+          retention-days: 7
+  package:
+    name: APK universal sem assinatura
+    needs: [source-package, generate-bridge, native]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          submodules: recursive
+          persist-credentials: false
+      - name: Install Java 17 and Android SDK components
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y openjdk-17-jdk-headless
+          echo "$JAVA_HOME/bin" >> "$GITHUB_PATH"
+          sdkmanager 'platforms;android-36' "build-tools;$BUILD_TOOLS_VERSION" platform-tools
+      - uses: nttld/setup-ndk@ed92fe6cadad69be94a966a7ee3271275e62f779
+        with:
+          ndk-version: ${{ env.NDK_VERSION }}
+          link-to-sdk: true
+      - uses: dtolnay/rust-toolchain@e97e2d8cc328f1b50210efc529dca0028893a2d9
+        with:
+          toolchain: ${{ env.RUST_VERSION }}
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2
+        with:
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+      - name: Apply upstream Flutter patch
+        run: |
+          cd "$(dirname "$(dirname "$(command -v flutter)")")"
+          git apply "$GITHUB_WORKSPACE/.github/patches/flutter_3.24.4_dropdown_menu_enableFilter.diff"
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          name: bridge-artifact
+          path: ./
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          pattern: Apollo11-Android-native-*
+          merge-multiple: true
+          path: flutter/android/app/src/main/jniLibs/
+      - name: Check mobile sources and fixed dark theme
+        working-directory: flutter
+        run: |
+          flutter pub get
+          flutter analyze --no-pub --no-fatal-infos --no-fatal-warnings lib/mobile
+          flutter test --no-pub --timeout 60s test/desktop_fixed_theme_test.dart
+      - name: Build unsigned release APK
+        working-directory: flutter
+        run: |
+          test ! -e android/key.properties
+          sed -i 's/org.gradle.jvmargs=-Xmx1024M/org.gradle.jvmargs=-Xmx3g/' android/gradle.properties
+          flutter build apk --release \
+            --target-platform android-arm64,android-arm,android-x64 \
+            --build-name "$VERSION" --build-number "$ANDROID_VERSION_CODE" \
+            "--dart-define=APOLLO11_SOURCE_URL=$APOLLO11_SOURCE_URL"
+      - name: Verify and align APK
+        shell: bash
+        run: |
+          sdk_tools="$ANDROID_HOME/build-tools/$BUILD_TOOLS_VERSION"
+          mkdir -p output tooling
+          unsigned="output/Apollo11_Remoto-${VERSION}-android-universal-unsigned.apk"
+          "$sdk_tools/zipalign" -P 16 -f 4 flutter/build/app/outputs/flutter-apk/app-release.apk "$unsigned"
+          "$sdk_tools/zipalign" -c -P 16 4 "$unsigned"
+          if "$sdk_tools/apksigner" verify "$unsigned" > output/signature-check.txt 2>&1; then
+            echo '::error::O artefato de distribuição precisa estar sem assinatura.'
+            exit 1
+          fi
+          "$sdk_tools/aapt" dump badging "$unsigned" > output/apk-info.txt
+          python3 - "$unsigned" <<'PY'
+          import os, sys, zipfile
+          from pathlib import Path
+          with zipfile.ZipFile(sys.argv[1]) as apk:
+              names = set(apk.namelist())
+              for abi in ('arm64-v8a', 'armeabi-v7a', 'x86_64'):
+                  for library in ('libapp.so', 'libflutter.so', 'librustdesk.so', 'libc++_shared.so'):
+                      assert f'lib/{abi}/{library}' in names, f'{abi}/{library} ausente'
+          info = Path('output/apk-info.txt').read_text()
+          assert "package: name='com.apollo11.remoto'" in info
+          assert f"versionCode='{os.environ['ANDROID_VERSION_CODE']}'" in info
+          assert f"versionName='{os.environ['VERSION']}'" in info
+          assert "application-label:'Apollo11 Remoto'" in info
+          PY
+          cp "$sdk_tools/lib/apksigner.jar" tooling/
+          printf 'commit=%s\nversion=%s\nversionCode=%s\nsource=%s\n' \
+            "$GITHUB_SHA" "$VERSION" "$ANDROID_VERSION_CODE" "$APOLLO11_SOURCE_URL" > output/BUILD_INFO.txt
+          (cd output && sha256sum ./*.apk > SHA256SUMS.txt)
+          (cd tooling && sha256sum apksigner.jar > SHA256SUMS.txt)
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: Apollo11-Android-universal-unsigned
+          path: output/
+          if-no-files-found: error
+          retention-days: 30
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: Apollo11-Android-signing-tool
+          path: tooling/
+          if-no-files-found: error
+          retention-days: 30
+  smoke:
+    name: Instalação e abertura no Android 15
+    needs: package
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          name: Apollo11-Android-universal-unsigned
+          path: ${{ runner.temp }}/unsigned/
+      - name: Sign disposable emulator copy
+        run: |
+          sdkmanager "build-tools;$BUILD_TOOLS_VERSION"
+          mkdir -p "$RUNNER_TEMP/smoke"
+          keytool -genkeypair -keystore "$RUNNER_TEMP/smoke/ci-smoke.p12" \
+            -storetype PKCS12 -storepass android -keypass android -alias ci-smoke \
+            -keyalg RSA -keysize 2048 -validity 2 -dname 'CN=Apollo11 CI Smoke Test' -noprompt
+          "$ANDROID_HOME/build-tools/$BUILD_TOOLS_VERSION/apksigner" sign \
+            --ks "$RUNNER_TEMP/smoke/ci-smoke.p12" --ks-key-alias ci-smoke \
+            --ks-pass pass:android --key-pass pass:android \
+            --out "$RUNNER_TEMP/smoke/smoke.apk" "$RUNNER_TEMP/unsigned/"*.apk
+          "$ANDROID_HOME/build-tools/$BUILD_TOOLS_VERSION/apksigner" verify "$RUNNER_TEMP/smoke/smoke.apk"
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d
+        with:
+          api-level: 35
+          target: default
+          arch: x86_64
+          profile: pixel_6
+          ram-size: 2048M
+          disable-animations: true
+          emulator-boot-timeout: 600
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
+          script: bash .github/scripts/apollo11-android-smoke.sh "$RUNNER_TEMP/smoke/smoke.apk" "$RUNNER_TEMP/smoke/evidence"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: Apollo11-Android-smoke-evidence
+          path: ${{ runner.temp }}/smoke/evidence/
+          if-no-files-found: warn
+          retention-days: 30
