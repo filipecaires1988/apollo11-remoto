@@ -12,6 +12,7 @@ name: Apollo11 Remoto | Android
         required: false
 permissions:
   contents: read
+  actions: read
 concurrency:
   group: apollo11-android-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'push' }}
@@ -26,17 +27,72 @@ env:
   VCPKG_BINARY_SOURCES: clear;default,readwrite
   VERSION: 1.5.3-apollo11.8
   ANDROID_VERSION_CODE: '15308'
+  ANDROID_NATIVE_BASE_RUN: '45900042942'
+  ANDROID_NATIVE_BASE_COMMIT: bfc987c3d72763beb458a323bdffa2515f29ddcb
   APOLLO11_SOURCE_URL: ${{ inputs.source_url || format('https://github.com/filipecaires1988/apollo11-remoto/archive/{0}.zip', github.sha) }}
 jobs:
   source-package:
     name: Fontes correspondentes ao APK
     runs-on: ubuntu-24.04
     timeout-minutes: 10
+    outputs:
+      reuse-native: ${{ steps.reuse.outputs.reuse-native }}
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
         with:
           submodules: recursive
           persist-credentials: false
+          fetch-depth: 2
+      - name: Check unchanged native sources before reusing libraries
+        id: reuse
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 -m pip install --disable-pip-version-check PyYAML==6.0.2 || true
+          python3 - <<'PY'
+          import json, os, subprocess
+          from pathlib import Path
+          from urllib.request import Request, urlopen
+          reuse = False
+          try:
+              import yaml
+              base = os.environ['ANDROID_NATIVE_BASE_COMMIT']
+              run_id = os.environ['ANDROID_NATIVE_BASE_RUN']
+              workflow = '.github/workflows/apollo11-android.yml'
+              def git(*args):
+                  return subprocess.check_output(['git', *args], text=True).strip()
+              assert git('rev-parse', base) == base, 'Base commit unavailable'
+              subprocess.run(['git', 'merge-base', '--is-ancestor', base, 'HEAD'], check=True)
+              changed = git('diff', '--name-only', base, 'HEAD').splitlines()
+              assert all(p == workflow or p.startswith('flutter/android/app/src/main/res/') for p in changed), 'Native source changes require a full build'
+              previous = yaml.safe_load(git('show', f'{base}:{workflow}'))
+              current = yaml.safe_load(Path(workflow).read_text())
+              refs = {'ANDROID_NATIVE_BASE_RUN', 'ANDROID_NATIVE_BASE_COMMIT'}
+              def build_env(document):
+                  return {k: v for k, v in document['env'].items() if k not in refs}
+              assert build_env(previous) == build_env(current), 'Build environment changed'
+              for field in ('strategy', 'steps', 'runs-on'):
+                  assert previous['jobs']['native'][field] == current['jobs']['native'][field], f'Native {field} changed'
+              def api(path):
+                  request = Request(f"https://api.github.com/repos/{os.environ['GITHUB_REPOSITORY']}/{path}", headers={
+                      'Authorization': f"Bearer {os.environ['GH_TOKEN']}",
+                      'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'})
+                  with urlopen(request, timeout=30) as response:
+                      return json.load(response)
+              run = api(f'actions/runs/{run_id}')
+              assert run['head_sha'] == base and run['status'] == 'completed', 'Unexpected source run'
+              artifacts = api(f'actions/runs/{run_id}/artifacts?per_page=100')['artifacts']
+              required = {'bridge-artifact', 'Apollo11-Android-native-arm64-v8a',
+                          'Apollo11-Android-native-armeabi-v7a', 'Apollo11-Android-native-x86_64'}
+              available = {a['name'] for a in artifacts if not a['expired']}
+              assert required <= available, 'Native artifacts unavailable or expired'
+              reuse = True
+          except Exception as error:
+              print(f'Full native build: {error}')
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              output.write(f'reuse-native={str(reuse).lower()}\n')
+          print(f'Reuse verified native libraries: {reuse}')
+          PY
       - name: Verify public source URL and package complete source tree
         shell: bash
         run: |
@@ -80,10 +136,12 @@ jobs:
           retention-days: 30
   generate-bridge:
     needs: source-package
+    if: needs.source-package.outputs.reuse-native != 'true'
     uses: ./.github/workflows/bridge.yml
   native:
     name: Biblioteca Android ${{ matrix.abi }}
-    needs: generate-bridge
+    needs: [source-package, generate-bridge]
+    if: needs.source-package.outputs.reuse-native != 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 180
     strategy:
@@ -171,10 +229,12 @@ jobs:
   package:
     name: APK universal sem assinatura
     needs: [source-package, generate-bridge, native]
+    if: ${{ always() && needs.source-package.result == 'success' && (needs.native.result == 'success' || needs.source-package.outputs.reuse-native == 'true') }}
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     env:
       JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
+      APOLLO11_REUSE_ANDROID_NATIVE: ${{ needs.source-package.outputs.reuse-native }}
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
         with:
@@ -209,11 +269,15 @@ jobs:
         with:
           name: bridge-artifact
           path: ./
+          github-token: ${{ github.token }}
+          run-id: ${{ needs.source-package.outputs.reuse-native == 'true' && env.ANDROID_NATIVE_BASE_RUN || github.run_id }}
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
           pattern: Apollo11-Android-native-*
           merge-multiple: true
           path: flutter/android/app/src/main/jniLibs/
+          github-token: ${{ github.token }}
+          run-id: ${{ needs.source-package.outputs.reuse-native == 'true' && env.ANDROID_NATIVE_BASE_RUN || github.run_id }}
       - name: Check mobile sources and fixed dark theme
         working-directory: flutter
         run: |
@@ -259,6 +323,13 @@ jobs:
           cp "$sdk_tools/lib/apksigner.jar" tooling/
           printf 'commit=%s\nversion=%s\nversionCode=%s\nsource=%s\n' \
             "$GITHUB_SHA" "$VERSION" "$ANDROID_VERSION_CODE" "$APOLLO11_SOURCE_URL" > output/BUILD_INFO.txt
+          native_commit="$GITHUB_SHA"
+          native_run="$GITHUB_RUN_ID"
+          if [ "$APOLLO11_REUSE_ANDROID_NATIVE" = true ]; then
+            native_commit="$ANDROID_NATIVE_BASE_COMMIT"
+            native_run="$ANDROID_NATIVE_BASE_RUN"
+          fi
+          printf 'nativeSourceCommit=%s\nnativeSourceRun=%s\n' "$native_commit" "$native_run" >> output/BUILD_INFO.txt
           (cd output && sha256sum ./*.apk > SHA256SUMS.txt)
           (cd tooling && sha256sum apksigner.jar > SHA256SUMS.txt)
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
